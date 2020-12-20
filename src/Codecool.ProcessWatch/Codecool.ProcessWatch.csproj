@@ -12,4 +12,8 @@
     <CodeAnalysisRuleSet>..\Codecool.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="GtkSharp" Version="3.22.25.128" />
+  </ItemGroup>
+
 </Project>
