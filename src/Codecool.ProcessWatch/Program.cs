@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using Codecool.ProcessWatch.GUI;
 
 namespace Codecool.ProcessWatch
 {
