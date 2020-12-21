@@ -1,4 +1,4 @@
-namespace ProcessWatch.Controller
+namespace Codecool.ProcessWatch.Controller
 {
     public class ProcessWatchApplication
     {
