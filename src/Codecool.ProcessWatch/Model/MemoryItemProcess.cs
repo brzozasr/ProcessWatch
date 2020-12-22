@@ -30,19 +30,7 @@ namespace Codecool.ProcessWatch.Model
         }
 
         private MemoryItemProcess(int processId, string processName, long physicalMemoryUsage, int basePriority,
-            ProcessPriorityClass priorityClass)
-        {
-            ProcessId = processId.ToString();
-            ProcessName = processName;
-            PhysicalMemoryUsage = physicalMemoryUsage.ToString();
-            BasePriority = basePriority.ToString();
-            PriorityClass = priorityClass.ToString();
-            // UserProcessorTime = userProcessorTime.ToString();
-            // PrivilegedProcessorTime = privilegedProcessorTime.ToString();
-        }
-
-        private MemoryItemProcess(int processId, string processName, long physicalMemoryUsage, int basePriority,
-            ProcessPriorityClass priorityClass, TimeSpan userProcessorTime, TimeSpan privilegedProcessorTime,
+            string priorityClass, string userProcessorTime, TimeSpan privilegedProcessorTime,
             TimeSpan totalProcessorTime, long pagedSystemMemorySize, long pagedMemorySize, long peakPhysicalMemoryUsage,
             long peakPagedMemorySize)
         {
@@ -62,19 +50,53 @@ namespace Codecool.ProcessWatch.Model
 
         public List<MemoryItemProcess> GetMemoryItemProcessList()
         {
+            string priorityClass;
+            string userProcessorTime;
+            
             foreach (var process in Process.GetProcesses())
             {
-                prosessesList.Add(new MemoryItemProcess(
-                    process.Id,
-                    process.ProcessName,
-                    process.WorkingSet64,
-                    process.BasePriority,
-                    process.PriorityClass));
-                // process.TotalProcessorTime,
-                // process.PagedSystemMemorySize64,
-                // process.PagedMemorySize64,
-                // process.PeakWorkingSet64,
-                // process.PeakPagedMemorySize64));
+                try
+                {
+                    priorityClass = process.PriorityClass.ToString();
+                }
+                catch (Exception e)
+                {
+                    // ignored
+                    priorityClass = "N/A";
+                }
+                
+                try
+                {
+                    userProcessorTime = process.UserProcessorTime.ToString();
+                }
+                catch (Exception e)
+                {
+                    // ignored
+                    userProcessorTime = "N/A";
+                }
+
+                try
+                {
+                    prosessesList.Add(new MemoryItemProcess(
+                        process.Id,
+                        process.ProcessName,
+                        process.WorkingSet64,
+                        process.BasePriority,
+                        // process.PriorityClass,
+                        priorityClass,
+                        // process.UserProcessorTime,
+                        userProcessorTime,
+                        process.PrivilegedProcessorTime,
+                        process.TotalProcessorTime,
+                        process.PagedSystemMemorySize64,
+                        process.PagedMemorySize64,
+                        process.PeakWorkingSet64,
+                        process.PeakPagedMemorySize64));
+                }
+                catch (Exception e)
+                {
+                    // ignored
+                }
             }
 
             return prosessesList;

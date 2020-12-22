@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
@@ -11,27 +12,29 @@ namespace Codecool.ProcessWatch
     {
         public static void Main()
         {
-            // MemoryItemProcess prroc = new MemoryItemProcess();
-            // Console.WriteLine(prroc.GetMemoryItemProcessById(73066).ProcessName);
-            //
-            // MemoryItemProcess list = new MemoryItemProcess();
-            //
-            // Console.WriteLine(list.GetProcessesList().Count);
-            // Console.WriteLine(list.GetProcessesList()[0].ProcessName);
-            
-            
-            // foreach (MemoryItemProcess itemProcess in list.GetMemoryItemProcessList())
+            // foreach (var p in Process.GetProcesses())
             // {
-            //     Console.WriteLine(itemProcess.ProcessId + " " + itemProcess.ProcessName);
+            //     try
+            //     {
+            //         Console.WriteLine(p.StartInfo);
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         Console.WriteLine(e.Message);
+            //     }
             // }
 
-            foreach (var pr in Process.GetProcesses())
+
+            MemoryItemProcess processes = new MemoryItemProcess();
+
+            int i = 0;
+            foreach (var process in processes.GetMemoryItemProcessList())
             {
-                if (pr.HasExited)
-                {
-                    Console.WriteLine(pr.PriorityClass.ToString());
-                }
+                Console.WriteLine(process.ProcessId + " " + process.PriorityClass + " " + process.UserProcessorTime);
+                i++;
             }
+
+            Console.WriteLine("Processes: " + i);
         }
     }
 }
