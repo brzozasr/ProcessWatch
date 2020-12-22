@@ -5,6 +5,19 @@ namespace Codecool.ProcessWatch.Model
 {
     public static class Utilities
     {
+        // internal static string GetProcessId(int id)
+        // {
+        //     try
+        //     {
+        //         return id.ToString();
+        //     }
+        //     catch (Exception)
+        //     {
+        //         // ignored
+        //         return "N/A";
+        //     }
+        // }
+        
         internal static string GetProcessId(int id)
         {
             try
