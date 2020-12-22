@@ -23,7 +23,15 @@ namespace Codecool.ProcessWatch.Model
             try
             {
                 string name = Process.GetProcessById(id).ProcessName;
-                return name;
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    return "N/A";
+                }
+                else
+                {
+                    return name;
+                }
             }
             catch (Exception)
             {

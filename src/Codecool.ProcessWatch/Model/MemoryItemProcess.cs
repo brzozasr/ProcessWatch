@@ -21,8 +21,6 @@ namespace Codecool.ProcessWatch.Model
         public string PeakPagedMemorySize { get; } // int, Peak paged memory usage {PeakPagedMemorySize}
         public string StartInfoUserName { get; }
         public string ThreadsNumber { get; }
-        
-        private List<MemoryItemProcess> prosessesList = new List<MemoryItemProcess>();
 
         public MemoryItemProcess(int processId)
         {

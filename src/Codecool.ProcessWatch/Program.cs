@@ -12,32 +12,16 @@ namespace Codecool.ProcessWatch
     {
         public static void Main()
         {
-            // foreach (var p in Process.GetProcesses())
-            // {
-            //     try
-            //     {
-            //         Console.WriteLine(p.StartInfo);
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         Console.WriteLine(e.Message);
-            //     }
-            // }
-            
-
-            int i = 0;
-            foreach (var process in Process.GetProcesses())
+            DataHelper dataHelper = new DataHelper();
+            foreach (var memoryItem in dataHelper.GetMemoryItemProcessList())
             {
-                ProcessThreadCollection name = Process.GetProcessById(process.Id).Threads;
-                int test = name.Count;
-                Console.WriteLine(test);
-                i++;
+                Console.WriteLine($"{memoryItem.ProcessId} => {memoryItem.ProcessName} => {memoryItem.ThreadsNumber}");
             }
 
-            Console.WriteLine("Processes: " + i);
-            
-            
-            
+            foreach (var process in Process.GetProcesses())
+            {
+                Console.WriteLine(process.MainWindowHandle);
+            }
         }
     }
 }
