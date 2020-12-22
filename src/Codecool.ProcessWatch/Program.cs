@@ -23,18 +23,21 @@ namespace Codecool.ProcessWatch
             //         Console.WriteLine(e.Message);
             //     }
             // }
-
-
-            MemoryItemProcess processes = new MemoryItemProcess();
+            
 
             int i = 0;
-            foreach (var process in processes.GetMemoryItemProcessList())
+            foreach (var process in Process.GetProcesses())
             {
-                Console.WriteLine(process.ProcessId + " " + process.PriorityClass + " " + process.UserProcessorTime);
+                ProcessThreadCollection name = Process.GetProcessById(process.Id).Threads;
+                int test = name.Count;
+                Console.WriteLine(test);
                 i++;
             }
 
             Console.WriteLine("Processes: " + i);
+            
+            
+            
         }
     }
 }
