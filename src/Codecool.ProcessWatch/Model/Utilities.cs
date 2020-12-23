@@ -44,21 +44,7 @@ namespace Codecool.ProcessWatch.Model
         {
             try
             {
-                long physicalMemoryUsage = Process.GetProcessById(id).WorkingSet64;
-
-                if (physicalMemoryUsage >= 1024 * 1024)
-                {
-                    return (physicalMemoryUsage / 1024 / 1024).ToString("0.## MB");
-                }
-                else if (physicalMemoryUsage >= 1024)
-                {
-                    return (physicalMemoryUsage / 1024).ToString("0.## kB");
-                }
-                else
-                {
-                    return (physicalMemoryUsage).ToString("0 B");
-                }
-                
+                return Process.GetProcessById(id).WorkingSet64.ToString();
             }
             catch (Exception)
             {
@@ -292,6 +278,27 @@ namespace Codecool.ProcessWatch.Model
                 // ignored
                 return "N/A";
             }
+        }
+
+        internal static string ByteConverter(double? noByte)
+        {
+            if (noByte.HasValue)
+            {
+                if (noByte.Value >= 1024 * 1024)
+                {
+                    return (noByte.Value / 1024 / 1024).ToString("0.## MB");
+                }
+                else if (noByte.Value >= 1024)
+                {
+                    return (noByte.Value / 1024).ToString("0.## kB");
+                }
+                else
+                {
+                    return noByte.Value.ToString("0 Byte");
+                }
+            }
+
+            return "N/A";
         }
     }
 }
