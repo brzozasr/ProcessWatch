@@ -4,5 +4,38 @@
         <name>Codecool.ProcessWatch</name>
     </assembly>
     <members>
+        <member name="T:Codecool.ProcessWatch.Model.MemoryItemProcess">
+            <summary>
+            Model of the memory processes
+            </summary>
+        </member>
+        <member name="M:Codecool.ProcessWatch.Model.Utilities.GetPagedSystemMemorySize(System.Int32)">
+            <summary>
+            Paged System Memory (MacOS = 0 Byte)
+            </summary>
+            <param name="id">Process ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:Codecool.ProcessWatch.Model.Utilities.GetPagedMemorySize(System.Int32)">
+            <summary>
+            Paged Memory Size (MacOS = 0 Byte)
+            </summary>
+            <param name="id">Process ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:Codecool.ProcessWatch.Model.Utilities.GetPeakPhysicalMemoryUsage(System.Int32)">
+            <summary>
+            Peak Physical Memory Usage (MacOS = 0 Byte)
+            </summary>
+            <param name="id">Process ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:Codecool.ProcessWatch.Model.Utilities.GetPeakPagedMemorySize(System.Int32)">
+            <summary>
+            Peak Paged Memory Size (MacOS = 0 Byte)
+            </summary>
+            <param name="id">Process ID</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

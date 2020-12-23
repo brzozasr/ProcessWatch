@@ -1,83 +1,48 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using static Codecool.ProcessWatch.Model.Utilities;
 
 namespace Codecool.ProcessWatch.Model
 {
+    /// <summary>
+    /// Model of the memory processes
+    /// </summary>
     public class MemoryItemProcess
     {
-        public string ProcessId { get; }
-        public string ProcessName { get; } // string
-        public string PhysicalMemoryUsage { get; } // long, Physical memory usage {myProcess.WorkingSet64}
-        public string BasePriority { get; } // int, Base priority {myProcess.BasePriority}
+        public int? ProcessId { get; }
+        public string ProcessName { get; }
+        public long? PhysicalMemoryUsage { get; } // long, Physical memory usage {myProcess.WorkingSet64}
         public string PriorityClass { get; } // ProcessPriorityClass, Priority class {myProcess.PriorityClass}
-        public string UserProcessorTime { get; } // TimeSpan, User processor time {myProcess.UserProcessorTime}
-
-        public string PrivilegedProcessorTime { get; } // TimeSpan, Privileged processor time {PrivilegedProcessorTime}
-
-        public string TotalProcessorTime { get; } // TimeSpan,  Total processor time {myProcess.TotalProcessorTime}
-
-        public string
-            PagedSystemMemorySize { get; } // int, Paged system memory size {myProcess.PagedSystemMemorySize64}
-
-        public string PagedMemorySize { get; } // int, Paged memory size {myProcess.PagedMemorySize64}
-        public string PeakPhysicalMemoryUsage { get; } // int,  Peak physical memory usage {peakWorkingSet}
-        public string PeakPagedMemorySize { get; } // int, Peak paged memory usage {PeakPagedMemorySize}
-        private List<MemoryItemProcess> prosessesList = new List<MemoryItemProcess>();
-
-        public MemoryItemProcess()
+        public double? UserProcessorTime { get; } // TimeSpan, User processor time {myProcess.UserProcessorTime}
+        public double? PrivilegedProcessorTime { get; } // TimeSpan, Privileged processor time {PrivilegedProcessorTime}
+        public double? TotalProcessorTime { get; } // TimeSpan,  Total processor time {myProcess.TotalProcessorTime}
+        public int? ThreadsNumber { get; }
+        public DateTime? StartTime { get; }
+        public int? BasePriority { get; } // int, Base priority {myProcess.BasePriority}
+        public double? PagedSystemMemorySize { get; } // int, Paged system memory size {myProcess.PagedSystemMemorySize64}
+        public double? PagedMemorySize { get; } // int, Paged memory size {myProcess.PagedMemorySize64}
+        public double? PeakPhysicalMemoryUsage { get; } // int,  Peak physical memory usage {peakWorkingSet}
+        public double? PeakPagedMemorySize { get; } // int, Peak paged memory usage {PeakPagedMemorySize}
+        public string StartInfoUserName { get; }
+        
+        public MemoryItemProcess(int processId)
         {
-        }
-
-        private MemoryItemProcess(int processId, string processName, long physicalMemoryUsage, int basePriority,
-            ProcessPriorityClass priorityClass)
-        {
-            ProcessId = processId.ToString();
-            ProcessName = processName;
-            PhysicalMemoryUsage = physicalMemoryUsage.ToString();
-            BasePriority = basePriority.ToString();
-            PriorityClass = priorityClass.ToString();
-            // UserProcessorTime = userProcessorTime.ToString();
-            // PrivilegedProcessorTime = privilegedProcessorTime.ToString();
-        }
-
-        private MemoryItemProcess(int processId, string processName, long physicalMemoryUsage, int basePriority,
-            ProcessPriorityClass priorityClass, TimeSpan userProcessorTime, TimeSpan privilegedProcessorTime,
-            TimeSpan totalProcessorTime, long pagedSystemMemorySize, long pagedMemorySize, long peakPhysicalMemoryUsage,
-            long peakPagedMemorySize)
-        {
-            ProcessId = processId.ToString();
-            ProcessName = processName;
-            PhysicalMemoryUsage = physicalMemoryUsage.ToString();
-            BasePriority = basePriority.ToString();
-            PriorityClass = priorityClass.ToString();
-            UserProcessorTime = userProcessorTime.ToString();
-            PrivilegedProcessorTime = privilegedProcessorTime.ToString();
-            TotalProcessorTime = totalProcessorTime.ToString();
-            PagedSystemMemorySize = pagedSystemMemorySize.ToString();
-            PagedMemorySize = pagedMemorySize.ToString();
-            PeakPhysicalMemoryUsage = peakPhysicalMemoryUsage.ToString();
-            PeakPagedMemorySize = peakPagedMemorySize.ToString();
-        }
-
-        public List<MemoryItemProcess> GetMemoryItemProcessList()
-        {
-            foreach (var process in Process.GetProcesses())
-            {
-                prosessesList.Add(new MemoryItemProcess(
-                    process.Id,
-                    process.ProcessName,
-                    process.WorkingSet64,
-                    process.BasePriority,
-                    process.PriorityClass));
-                // process.TotalProcessorTime,
-                // process.PagedSystemMemorySize64,
-                // process.PagedMemorySize64,
-                // process.PeakWorkingSet64,
-                // process.PeakPagedMemorySize64));
-            }
-
-            return prosessesList;
+            ProcessId = GetProcessId(processId); 
+            ProcessName = GetProcessName(processId); 
+            PhysicalMemoryUsage = GetPhysicalMemoryUsage(processId); 
+            PriorityClass = GetPriorityClass(processId); 
+            UserProcessorTime = GetUserProcessorTime(processId); 
+            PrivilegedProcessorTime = GetPrivilegedProcessorTime(processId); 
+            TotalProcessorTime = GetTotalProcessorTime(processId); 
+            ThreadsNumber = GetThreadsNumber(processId);
+            StartTime = GetStartTime(processId);
+            BasePriority = GetBasePriority(processId); 
+            PagedSystemMemorySize = GetPagedSystemMemorySize(processId); 
+            PagedMemorySize = GetPagedMemorySize(processId); //
+            PeakPhysicalMemoryUsage = GetPeakPhysicalMemoryUsage(processId); 
+            PeakPagedMemorySize = GetPeakPagedMemorySize(processId); 
+            StartInfoUserName = GetStartInfoUserName(processId); 
         }
     }
 }

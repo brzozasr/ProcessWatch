@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
-using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.Model;
 
 namespace Codecool.ProcessWatch
@@ -11,27 +10,39 @@ namespace Codecool.ProcessWatch
     {
         public static void Main()
         {
-            // MemoryItemProcess prroc = new MemoryItemProcess();
-            // Console.WriteLine(prroc.GetMemoryItemProcessById(73066).ProcessName);
-            //
-            // MemoryItemProcess list = new MemoryItemProcess();
-            //
-            // Console.WriteLine(list.GetProcessesList().Count);
-            // Console.WriteLine(list.GetProcessesList()[0].ProcessName);
-            
-            
-            // foreach (MemoryItemProcess itemProcess in list.GetMemoryItemProcessList())
-            // {
-            //     Console.WriteLine(itemProcess.ProcessId + " " + itemProcess.ProcessName);
-            // }
+            int pageSize = 20;
 
-            foreach (var pr in Process.GetProcesses())
+            (int NumberOfPages, List<MemoryItemProcess> ProcessesList) pagination =
+                ProcessWatchApplication.ProcessesPagination(pageSize, 1);
+            
+            StringBuilder sb = new StringBuilder();
+
+            string line = new String('-', 193);
+
+            sb.Append($"+{line}+\n");
+            foreach (var memoryItem in pagination.ProcessesList)
             {
-                if (pr.HasExited)
-                {
-                    Console.WriteLine(pr.PriorityClass.ToString());
-                }
+                sb.Append($"| {Converters.IntNullConverter(memoryItem.ProcessId),7} " +
+                          $"| {Converters.StrNullConverter(memoryItem.ProcessName),-16} " +
+                          $"| {Converters.ByteConverter(memoryItem.PhysicalMemoryUsage),10}  " +
+                          $"| {Converters.StrNullConverter(memoryItem.PriorityClass),-11} " +
+                          $"| {Converters.TimeConverter(memoryItem.UserProcessorTime),10} " +
+                          $"| {Converters.TimeConverter(memoryItem.PrivilegedProcessorTime),10} " +
+                          $"| {Converters.TimeConverter(memoryItem.TotalProcessorTime),10} " +
+                          $"| {Converters.IntNullConverter(memoryItem.ThreadsNumber),3} " +
+                          $"| {Converters.DateTimeNullConverter(memoryItem.StartTime), 19} " +
+                          $"| {Converters.IntNullConverter(memoryItem.BasePriority),2} " +
+                          $"| {Converters.ByteConverter(memoryItem.PagedSystemMemorySize),10} " +
+                          $"| {Converters.ByteConverter(memoryItem.PagedMemorySize),10} " +
+                          $"| {Converters.ByteConverter(memoryItem.PeakPhysicalMemoryUsage),10} " +
+                          $"| {Converters.ByteConverter(memoryItem.PeakPagedMemorySize),10} " +
+                          $"| {Converters.StrNullConverter(memoryItem.StartInfoUserName),-10} |\n");
             }
+
+            sb.Append($"+{line}+\n");
+            Console.WriteLine(sb.ToString());
+
+            Console.WriteLine($"Number of pages: {pagination.NumberOfPages}");
         }
     }
 }
