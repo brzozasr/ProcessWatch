@@ -15,18 +15,25 @@ namespace Codecool.ProcessWatch
         {
             DataHelper dataHelper = new DataHelper();
             
-            string line = new String('-', 139);
+            string line = new String('-', 167);
 
             Console.WriteLine($"+{line}+");
             foreach (var memoryItem in dataHelper.GetMemoryItemProcessList())
             {
-                Console.WriteLine($"|{memoryItem.ProcessId, 7} | {memoryItem.ProcessName, -16} " +
-                                  $"| {memoryItem.PhysicalMemoryUsage, 7} | {memoryItem.BasePriority, 2} " +
-                                  $"| {memoryItem.PriorityClass, -11} | {memoryItem.UserProcessorTime, 10} " +
-                                  $"| {memoryItem.PrivilegedProcessorTime, 10} | {memoryItem.TotalProcessorTime, 10} " +
-                                  $"| {memoryItem.PagedSystemMemorySize, 5} | {memoryItem.PagedMemorySize, 5} " +
-                                  $"| {memoryItem.PeakPhysicalMemoryUsage, 5} | {memoryItem.PeakPagedMemorySize, 5} " +
-                                  $"| {memoryItem.StartInfoUserName, 4} | {memoryItem.ThreadsNumber, 3}|");
+                Console.WriteLine($"| {Utilities.IntNullConverter(memoryItem.ProcessId), 7} " +
+                                  $"| {Utilities.StrNullConverter(memoryItem.ProcessName), -16} " +
+                                  $"| {Utilities.ByteConverter(memoryItem.PhysicalMemoryUsage), 10}  " +
+                                  $"| {Utilities.StrNullConverter(memoryItem.PriorityClass), -11} " +
+                                  $"| {Utilities.TimeConverter(memoryItem.UserProcessorTime), 10} " +
+                                  $"| {Utilities.TimeConverter(memoryItem.PrivilegedProcessorTime), 10} " +
+                                  $"| {Utilities.TimeConverter(memoryItem.TotalProcessorTime), 10} " +
+                                  $"| {Utilities.IntNullConverter(memoryItem.ThreadsNumber), 3} " +
+                                  $"| {Utilities.IntNullConverter(memoryItem.BasePriority), 2} " +
+                                  $"| {Utilities.ByteConverter(memoryItem.PagedSystemMemorySize), 10} " +
+                                  $"| {Utilities.ByteConverter(memoryItem.PagedMemorySize), 10} " +
+                                  $"| {Utilities.ByteConverter(memoryItem.PeakPhysicalMemoryUsage), 10} " +
+                                  $"| {Utilities.ByteConverter(memoryItem.PeakPagedMemorySize), 5} " +
+                                  $"| {Utilities.StrNullConverter(memoryItem.StartInfoUserName), -10} |");
             }
             
             Console.WriteLine($"+{line}+");

@@ -5,16 +5,16 @@ namespace Codecool.ProcessWatch.Model
 {
     public static class Utilities
     {
-        internal static string GetProcessId(int id)
+        internal static int? GetProcessId(int id)
         {
             try
             {
-                return id.ToString();
+                return id;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
@@ -26,7 +26,7 @@ namespace Codecool.ProcessWatch.Model
 
                 if (string.IsNullOrEmpty(name))
                 {
-                    return "N/A";
+                    return null;
                 }
                 else
                 {
@@ -36,37 +36,23 @@ namespace Codecool.ProcessWatch.Model
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
-        internal static string GetPhysicalMemoryUsage(int id)
+        internal static long? GetPhysicalMemoryUsage(int id)
         {
             try
             {
-                return Process.GetProcessById(id).WorkingSet64.ToString();
+                return Process.GetProcessById(id).WorkingSet64;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
-        
-        internal static string GetBasePriority(int id)
-        {
-            try
-            {
-                int basePriority = Process.GetProcessById(id).BasePriority;
-                return basePriority.ToString();
-            }
-            catch (Exception)
-            {
-                // ignored
-                return "N/A";
-            }
-        }
-        
+
         internal static string GetPriorityClass(int id)
         {
             try
@@ -77,225 +63,220 @@ namespace Codecool.ProcessWatch.Model
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
-        internal static string GetUserProcessorTime(int id)
+        internal static double? GetUserProcessorTime(int id)
         {
             try
             {
                 TimeSpan userProcessorTime = Process.GetProcessById(id).UserProcessorTime;
-                double time = userProcessorTime.TotalMilliseconds;
-                if (time >= 1000)
-                {
-                    return (time / 1000).ToString("0.## s");
-                }
-                else
-                {
-                    return time.ToString("0.## ms");
-                }
+                return userProcessorTime.TotalMilliseconds;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
-        internal static string GetPrivilegedProcessorTime(int id)
+        internal static double? GetPrivilegedProcessorTime(int id)
         {
             try
             {
                 TimeSpan privilegedProcessorTime = Process.GetProcessById(id).PrivilegedProcessorTime;
-                double time = privilegedProcessorTime.TotalMilliseconds;
-                if (time >= 1000)
-                {
-                    return (time / 1000).ToString("0.## s");
-                }
-                else
-                {
-                    return time.ToString("0.## ms");
-                }
+                return privilegedProcessorTime.TotalMilliseconds;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
-        internal static string GetTotalProcessorTime(int id)
+        internal static double? GetTotalProcessorTime(int id)
         {
             try
             {
                 TimeSpan totalProcessorTime = Process.GetProcessById(id).TotalProcessorTime;
-                double time = totalProcessorTime.TotalMilliseconds;
-                if (time >= 1000)
-                {
-                    return (time / 1000).ToString("0.## s");
-                }
-                else
-                {
-                    return time.ToString("0.## ms");
-                }
+                return totalProcessorTime.TotalMilliseconds;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
-        
-        internal static string GetPagedSystemMemorySize(int id)
-        {
-            try
-            {
-                long pagedSystemMemorySize = Process.GetProcessById(id).PagedSystemMemorySize64;
 
-                if (pagedSystemMemorySize >= 1024 * 1024)
-                {
-                    return (pagedSystemMemorySize / 1024 / 1024).ToString("0.## MB");
-                }
-                else if (pagedSystemMemorySize >= 1024)
-                {
-                    return (pagedSystemMemorySize / 1024).ToString("0.## kB");
-                }
-                else
-                {
-                    return pagedSystemMemorySize.ToString("0 B");
-                }
-                
-            }
-            catch (Exception)
-            {
-                // ignored
-                return "N/A";
-            }
-        }
-        
-        internal static string GetPagedMemorySize(int id)
-        {
-            try
-            {
-                long pagedMemorySize = Process.GetProcessById(id).PagedMemorySize64;
-                
-                if (pagedMemorySize >= 1024 * 1024)
-                {
-                    return (pagedMemorySize / 1024 / 1024).ToString("0.## MB");
-                }
-                else if (pagedMemorySize >= 1024)
-                {
-                    return (pagedMemorySize / 1024).ToString("0.## kB");
-                }
-                else
-                {
-                    return pagedMemorySize.ToString("0 B");
-                }
-            }
-            catch (Exception)
-            {
-                // ignored
-                return "N/A";
-            }
-        }
-        
-        internal static string GetPeakPhysicalMemoryUsage(int id)
-        {
-            try
-            {
-                long peakPhysicalMemoryUsage = Process.GetProcessById(id).PeakWorkingSet64;
-                
-                if (peakPhysicalMemoryUsage >= 1024 * 1024)
-                {
-                    return (peakPhysicalMemoryUsage / 1024 / 1024).ToString("0.## MB");
-                }
-                else if (peakPhysicalMemoryUsage >= 1024)
-                {
-                    return (peakPhysicalMemoryUsage / 1024).ToString("0.## kB");
-                }
-                else
-                {
-                    return peakPhysicalMemoryUsage.ToString("0 B");
-                }
-            }
-            catch (Exception)
-            {
-                // ignored
-                return "N/A";
-            }
-        }
-        
-        internal static string GetPeakPagedMemorySize(int id)
-        {
-            try
-            {
-                long peakPagedMemorySize = Process.GetProcessById(id).PeakPagedMemorySize64;
-                
-                if (peakPagedMemorySize >= 1024 * 1024)
-                {
-                    return (peakPagedMemorySize / 1024 / 1024).ToString("0.## MB");
-                }
-                else if (peakPagedMemorySize >= 1024)
-                {
-                    return (peakPagedMemorySize / 1024).ToString("0.## kB");
-                }
-                else
-                {
-                    return peakPagedMemorySize.ToString("0 B");
-                }
-            }
-            catch (Exception)
-            {
-                // ignored
-                return "N/A";
-            }
-        }
-        
         internal static string GetStartInfoUserName(int id)
         {
             try
             {
-                string name = Process.GetProcessById(id).StartInfo.UserName;
-                return name;
+                return Process.GetProcessById(id).StartInfo.UserName;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
             }
         }
         
-        internal static string GetThreadsNumber(int id)
+        internal static int? GetThreadsNumber(int id)
         {
             try
             {
-                int threadsCount = Process.GetProcessById(id).Threads.Count;
-                return threadsCount.ToString();
+                return Process.GetProcessById(id).Threads.Count;
             }
             catch (Exception)
             {
                 // ignored
-                return "N/A";
+                return null;
+            }
+        }
+        
+        internal static int? GetBasePriority(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).BasePriority;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Paged System Memory (MacOS = 0 Byte)
+        /// </summary>
+        /// <param name="id">Process ID</param>
+        /// <returns></returns>
+        internal static long? GetPagedSystemMemorySize(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).PagedSystemMemorySize64;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Paged Memory Size (MacOS = 0 Byte)
+        /// </summary>
+        /// <param name="id">Process ID</param>
+        /// <returns></returns>
+        internal static long? GetPagedMemorySize(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).PagedMemorySize64;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Peak Physical Memory Usage (MacOS = 0 Byte)
+        /// </summary>
+        /// <param name="id">Process ID</param>
+        /// <returns></returns>
+        internal static long? GetPeakPhysicalMemoryUsage(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).PeakWorkingSet64;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Peak Paged Memory Size (MacOS = 0 Byte)
+        /// </summary>
+        /// <param name="id">Process ID</param>
+        /// <returns></returns>
+        internal static long? GetPeakPagedMemorySize(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).PeakPagedMemorySize64;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
             }
         }
 
-        internal static string ByteConverter(double? noByte)
+        internal static string ByteConverter(double? totalBytes)
         {
-            if (noByte.HasValue)
+            if (totalBytes.HasValue)
             {
-                if (noByte.Value >= 1024 * 1024)
+                if (totalBytes.Value >= 1024 * 1024 * 1024)
                 {
-                    return (noByte.Value / 1024 / 1024).ToString("0.## MB");
+                    return (totalBytes.Value / 1024 / 1024 / 1024).ToString("0.## GB");
                 }
-                else if (noByte.Value >= 1024)
+                else if (totalBytes.Value >= 1024 * 1024)
                 {
-                    return (noByte.Value / 1024).ToString("0.## kB");
+                    return (totalBytes.Value / 1024 / 1024).ToString("0.## MB");
+                }
+                else if (totalBytes.Value >= 1024)
+                {
+                    return (totalBytes.Value / 1024).ToString("0.## kB");
                 }
                 else
                 {
-                    return noByte.Value.ToString("0 Byte");
+                    return totalBytes.Value.ToString("0 Byte");
                 }
+            }
+
+            return "N/A";
+        }
+
+        internal static string TimeConverter(double? totalMilliseconds)
+        {
+            if (totalMilliseconds.HasValue)
+            {
+                if (totalMilliseconds.Value >= 1000)
+                {
+                    return (totalMilliseconds.Value / 1000).ToString("0.## s");
+                }
+                else
+                {
+                    return totalMilliseconds.Value.ToString("0.## ms");
+                }
+            }
+
+            return "N/A";
+        }
+
+        internal static string StrNullConverter(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return "N/A";
+            }
+
+            return str;
+        }
+        
+        internal static string IntNullConverter(int? value)
+        {
+            if (value.HasValue)
+            {
+                return value.ToString();
             }
 
             return "N/A";
