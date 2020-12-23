@@ -1,3 +1,5 @@
+using System;
+
 namespace Codecool.ProcessWatch.Controller
 {
     public static class Converters
@@ -55,6 +57,16 @@ namespace Codecool.ProcessWatch.Controller
         }
         
         internal static string IntNullConverter(int? value)
+        {
+            if (value.HasValue)
+            {
+                return value.ToString();
+            }
+
+            return "N/A";
+        }
+        
+        internal static string DateTimeNullConverter(DateTime? value)
         {
             if (value.HasValue)
             {

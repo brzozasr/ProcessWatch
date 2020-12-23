@@ -6,21 +6,21 @@ namespace Codecool.ProcessWatch.Model
 {
     public class DataHelper
     {
-        private readonly List<MemoryItemProcess> _prosessesList;
+        private readonly List<MemoryItemProcess> _processesList;
 
-        public DataHelper()
+        internal DataHelper()
         {
-            _prosessesList = new List<MemoryItemProcess>();
+            _processesList = new List<MemoryItemProcess>();
         }
 
-        public List<MemoryItemProcess> GetMemoryItemProcessList()
+        internal List<MemoryItemProcess> GetAllMemoryItemProcesses()
         {
             foreach (var process in Process.GetProcesses())
             {
-                _prosessesList.Add(new MemoryItemProcess(process.Id));
+                _processesList.Add(new MemoryItemProcess(process.Id));
             }
 
-            return _prosessesList;
+            return _processesList;
         }
     }
 }

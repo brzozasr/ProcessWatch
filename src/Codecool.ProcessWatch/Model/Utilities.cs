@@ -148,6 +148,19 @@ namespace Codecool.ProcessWatch.Model
             }
         }
         
+        internal static DateTime? GetStartTime(int id)
+        {
+            try
+            {
+                return Process.GetProcessById(id).StartTime;
+            }
+            catch (Exception)
+            {
+                // ignored
+                return null;
+            }
+        }
+        
         /// <summary>
         /// Paged System Memory (MacOS = 0 Byte)
         /// </summary>

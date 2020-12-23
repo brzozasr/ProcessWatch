@@ -18,6 +18,7 @@ namespace Codecool.ProcessWatch.Model
         public double? PrivilegedProcessorTime { get; } // TimeSpan, Privileged processor time {PrivilegedProcessorTime}
         public double? TotalProcessorTime { get; } // TimeSpan,  Total processor time {myProcess.TotalProcessorTime}
         public int? ThreadsNumber { get; }
+        public DateTime? StartTime { get; }
         public int? BasePriority { get; } // int, Base priority {myProcess.BasePriority}
         public double? PagedSystemMemorySize { get; } // int, Paged system memory size {myProcess.PagedSystemMemorySize64}
         public double? PagedMemorySize { get; } // int, Paged memory size {myProcess.PagedMemorySize64}
@@ -27,20 +28,21 @@ namespace Codecool.ProcessWatch.Model
         
         public MemoryItemProcess(int processId)
         {
-            ProcessId = GetProcessId(processId); //
-            ProcessName = GetProcessName(processId); //
-            PhysicalMemoryUsage = GetPhysicalMemoryUsage(processId); //
-            PriorityClass = GetPriorityClass(processId); //
-            UserProcessorTime = GetUserProcessorTime(processId); //
-            PrivilegedProcessorTime = GetPrivilegedProcessorTime(processId); //
-            TotalProcessorTime = GetTotalProcessorTime(processId); //
+            ProcessId = GetProcessId(processId); 
+            ProcessName = GetProcessName(processId); 
+            PhysicalMemoryUsage = GetPhysicalMemoryUsage(processId); 
+            PriorityClass = GetPriorityClass(processId); 
+            UserProcessorTime = GetUserProcessorTime(processId); 
+            PrivilegedProcessorTime = GetPrivilegedProcessorTime(processId); 
+            TotalProcessorTime = GetTotalProcessorTime(processId); 
             ThreadsNumber = GetThreadsNumber(processId);
-            BasePriority = GetBasePriority(processId); //
-            PagedSystemMemorySize = GetPagedSystemMemorySize(processId); //
+            StartTime = GetStartTime(processId);
+            BasePriority = GetBasePriority(processId); 
+            PagedSystemMemorySize = GetPagedSystemMemorySize(processId); 
             PagedMemorySize = GetPagedMemorySize(processId); //
-            PeakPhysicalMemoryUsage = GetPeakPhysicalMemoryUsage(processId); //
-            PeakPagedMemorySize = GetPeakPagedMemorySize(processId); //
-            StartInfoUserName = GetStartInfoUserName(processId); //
+            PeakPhysicalMemoryUsage = GetPeakPhysicalMemoryUsage(processId); 
+            PeakPagedMemorySize = GetPeakPagedMemorySize(processId); 
+            StartInfoUserName = GetStartInfoUserName(processId); 
         }
     }
 }
