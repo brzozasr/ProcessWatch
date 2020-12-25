@@ -17,7 +17,7 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, allMemoryItemProcesses);
         }
 
-        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesByNamePagination(
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesByName(
             int pageSize, int pageNo, string searchedString)
         {
             var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
@@ -33,7 +33,7 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedProcesses);
         }
 
-        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartEarlierThanDate(
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartBeforeDate(
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
         {
@@ -63,6 +63,36 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
         
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAfterDate(
+            int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
+            int? year = null)
+        {
+            minute ??= DateTime.Now.Minute;
+            hour ??= DateTime.Now.Hour;
+            day ??= DateTime.Now.Day;
+            month ??= DateTime.Now.Month;
+            year ??= DateTime.Now.Year;
+
+            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+
+            DateTime searchingDate;
+
+            try
+            {
+                searchingDate = new DateTime(year.Value, month.Value, day.Value, hour.Value, minute.Value, 0);
+            }
+            catch (Exception)
+            {
+                searchingDate = DateTime.Today;
+            }
+
+            var searchedDatesList = allMemoryItemProcesses
+                .Where(x => x.StartTime != null && x.StartTime.Value > searchingDate).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedDatesList);
+        }
+        
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDay(
             int pageSize, int pageNo, int day)
         {
@@ -81,6 +111,55 @@ namespace Codecool.ProcessWatch.Controller
 
             var searchedDatesList = allMemoryItemProcesses
                 .Where(x => x.StartTime != null && x.StartTime.Value.Day == searchingDay).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedDatesList);
+        }
+        
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtMonth(
+            int pageSize, int pageNo, int month)
+        {
+            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+
+            int searchingMonth;
+
+            if (month > 0 && month <= 12)
+            {
+                searchingMonth = month;
+            }
+            else
+            {
+                searchingMonth = DateTime.Now.Month;
+            }
+
+            var searchedDatesList = allMemoryItemProcesses
+                .Where(x => x.StartTime != null && x.StartTime.Value.Month == searchingMonth).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedDatesList);
+        }
+        
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDate(
+            int pageSize, int pageNo, int day, int month, int year)
+        {
+            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+
+            DateTime searchingDate;
+
+            try
+            {
+                searchingDate = new DateTime(year, month, day);
+            }
+            catch (Exception)
+            {
+                searchingDate = DateTime.Today;
+            }
+
+            var searchedDatesList = allMemoryItemProcesses
+                .Where(x => x.StartTime != null
+                && x.StartTime.Value.Day == searchingDate.Day
+                && x.StartTime.Value.Month == searchingDate.Month
+                && x.StartTime.Value.Year == searchingDate.Year).ToList();
 
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);

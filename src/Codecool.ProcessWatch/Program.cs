@@ -12,7 +12,7 @@ namespace Codecool.ProcessWatch
         {
             int pageSize = 20;
 
-            var pagination = ProcessWatchApplication.SelectProcessesStartAtDay(pageSize, 1, day: 24);
+            var pagination = ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, 1, 24, 12, 2020);
 
             StringBuilder sb = new StringBuilder();
 
