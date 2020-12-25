@@ -9,25 +9,32 @@ namespace Codecool.ProcessWatch.Controller
 {
     public static class ProcessWatchApplication
     {
+        private static List<MemoryItemProcess> _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+        
+        public static void RefreshAllMemoryItemProcesses()
+        {
+            _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+        }
+        
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) AllProcesses(
             int pageSize, int pageNo)
         {
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
-            return ProcessesPagination(pageSize, pageNo, allMemoryItemProcesses);
+            return ProcessesPagination(pageSize, pageNo, _allMemoryItemProcesses);
         }
 
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesByName(
             int pageSize, int pageNo, string searchedString)
         {
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             var search = searchedString.ToLower();
 
             string pattern = @"" + search;
             Regex rgx = new Regex(pattern);
 
-            var searchedProcesses = allMemoryItemProcesses
+            var searchedProcesses = _allMemoryItemProcesses
                 .Where(x => !string.IsNullOrEmpty(x.ProcessName) && rgx.IsMatch(x.ProcessName.ToLower())).ToList();
 
             return ProcessesPagination(pageSize, pageNo, searchedProcesses);
@@ -43,7 +50,7 @@ namespace Codecool.ProcessWatch.Controller
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
 
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             DateTime searchingDate;
 
@@ -56,7 +63,7 @@ namespace Codecool.ProcessWatch.Controller
                 searchingDate = DateTime.Today;
             }
 
-            var searchedDatesList = allMemoryItemProcesses
+            var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null && x.StartTime.Value < searchingDate).ToList();
 
 
@@ -73,7 +80,7 @@ namespace Codecool.ProcessWatch.Controller
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
 
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             DateTime searchingDate;
 
@@ -86,7 +93,7 @@ namespace Codecool.ProcessWatch.Controller
                 searchingDate = DateTime.Today;
             }
 
-            var searchedDatesList = allMemoryItemProcesses
+            var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null && x.StartTime.Value > searchingDate).ToList();
 
 
@@ -96,7 +103,7 @@ namespace Codecool.ProcessWatch.Controller
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDay(
             int pageSize, int pageNo, int day)
         {
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             int searchingDay;
 
@@ -109,7 +116,7 @@ namespace Codecool.ProcessWatch.Controller
                 searchingDay = DateTime.Now.Day;
             }
 
-            var searchedDatesList = allMemoryItemProcesses
+            var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null && x.StartTime.Value.Day == searchingDay).ToList();
 
 
@@ -119,7 +126,7 @@ namespace Codecool.ProcessWatch.Controller
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtMonth(
             int pageSize, int pageNo, int month)
         {
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             int searchingMonth;
 
@@ -132,7 +139,7 @@ namespace Codecool.ProcessWatch.Controller
                 searchingMonth = DateTime.Now.Month;
             }
 
-            var searchedDatesList = allMemoryItemProcesses
+            var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null && x.StartTime.Value.Month == searchingMonth).ToList();
 
 
@@ -142,7 +149,7 @@ namespace Codecool.ProcessWatch.Controller
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDate(
             int pageSize, int pageNo, int day, int month, int year)
         {
-            var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
+            // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
             DateTime searchingDate;
 
@@ -155,7 +162,7 @@ namespace Codecool.ProcessWatch.Controller
                 searchingDate = DateTime.Today;
             }
 
-            var searchedDatesList = allMemoryItemProcesses
+            var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null
                 && x.StartTime.Value.Day == searchingDate.Day
                 && x.StartTime.Value.Month == searchingDate.Month
@@ -176,7 +183,10 @@ namespace Codecool.ProcessWatch.Controller
                 double numberOfPages = Math.Ceiling(pages);
 
                 var processesPage = listProcesses.OrderByDescending(x => x.StartTime)
-                    .Skip(pageNo - 1).Take(pageSize).ToList();
+                    .Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+                
+                // var processesPage = listProcesses.OrderBy(x => x.ProcessId).
+                //     Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 
                 return ((int) numberOfPages, processesPage);
             }
