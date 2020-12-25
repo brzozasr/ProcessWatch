@@ -12,9 +12,8 @@ namespace Codecool.ProcessWatch
         {
             int pageSize = 20;
 
-            (int NumberOfPages, List<MemoryItemProcess> ProcessesList) pagination =
-                ProcessWatchApplication.ProcessesPagination(pageSize, 1);
-            
+            var pagination = ProcessWatchApplication.SelectProcessesByNamePagination(pageSize, 1, "we");
+
             StringBuilder sb = new StringBuilder();
 
             string line = new String('-', 193);
@@ -30,7 +29,7 @@ namespace Codecool.ProcessWatch
                           $"| {Converters.TimeConverter(memoryItem.PrivilegedProcessorTime),10} " +
                           $"| {Converters.TimeConverter(memoryItem.TotalProcessorTime),10} " +
                           $"| {Converters.IntNullConverter(memoryItem.ThreadsNumber),3} " +
-                          $"| {Converters.DateTimeNullConverter(memoryItem.StartTime), 19} " +
+                          $"| {Converters.DateTimeNullConverter(memoryItem.StartTime),19} " +
                           $"| {Converters.IntNullConverter(memoryItem.BasePriority),2} " +
                           $"| {Converters.ByteConverter(memoryItem.PagedSystemMemorySize),10} " +
                           $"| {Converters.ByteConverter(memoryItem.PagedMemorySize),10} " +
