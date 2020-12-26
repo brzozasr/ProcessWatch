@@ -26,6 +26,13 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, _allMemoryItemProcesses);
         }
 
+        /// <summary>
+        /// Selects Processes that contain the search string.
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="searchedString">Searched string</param>
+        /// <returns></returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesByName(
             int pageSize, int pageNo, string searchedString)
         {
@@ -42,6 +49,19 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedProcesses);
         }
 
+        /// <summary>
+        /// Select Processes Start before given date.
+        /// All arguments with date are optional
+        /// (no given argument will be set for current DateTime).
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="minute">Minute (optional)</param>
+        /// <param name="hour">Hour (optional)</param>
+        /// <param name="day">Day (optional)</param>
+        /// <param name="month">Month (optional)</param>
+        /// <param name="year">Year (optional)</param>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartBeforeDate(
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
@@ -72,6 +92,19 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
         
+        /// <summary>
+        /// Select Processes Start after given date.
+        /// All arguments with date are optional
+        /// (no given argument will be set for current DateTime).
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="minute">Minute (optional)</param>
+        /// <param name="hour">Hour (optional)</param>
+        /// <param name="day">Day (optional)</param>
+        /// <param name="month">Month (optional)</param>
+        /// <param name="year">Year (optional)</param>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAfterDate(
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
@@ -102,6 +135,13 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
         
+        /// <summary>
+        /// Select Processes starts at given day
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="day">Day of month</param>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDay(
             int pageSize, int pageNo, int day)
         {
@@ -125,6 +165,13 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
         
+        /// <summary>
+        /// Select Processes starts at given month.
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="month">Month</param>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtMonth(
             int pageSize, int pageNo, int month)
         {
@@ -148,6 +195,15 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
         
+        /// <summary>
+        /// Select Processes starts at given date.
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="day"></param>
+        /// <param name="month">Month</param>
+        /// <param name="year">Year</param>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectProcessesStartAtDate(
             int pageSize, int pageNo, int day, int month, int year)
         {
@@ -175,12 +231,12 @@ namespace Codecool.ProcessWatch.Controller
         }
         
         /// <summary>
-        /// 
+        /// Select Physical Memory Usage greater than given memory in MB.
         /// </summary>
         /// <param name="pageSize">Page Size</param>
         /// <param name="pageNo">Number of the page</param>
         /// <param name="physicalMemoryUsage">Physical memory usage in MB</param>
-        /// <returns></returns>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectPhysicalMemoryUsageGreaterThan(
             int pageSize, int pageNo, double physicalMemoryUsage)
         {
@@ -195,12 +251,12 @@ namespace Codecool.ProcessWatch.Controller
         }
         
         /// <summary>
-        /// 
+        /// Select User Processor Time greater than given time in seconds
         /// </summary>
         /// <param name="pageSize">Page Size</param>
         /// <param name="pageNo">Number of the page</param>
         /// <param name="userProcessorTime">User Processor Time in seconds</param>
-        /// <returns></returns>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectUserProcessorTimeGreaterThan(
             int pageSize, int pageNo, double userProcessorTime)
         {
@@ -215,12 +271,12 @@ namespace Codecool.ProcessWatch.Controller
         }
         
         /// <summary>
-        /// 
+        /// Select Total Processor Time greater than given time in seconds.
         /// </summary>
         /// <param name="pageSize">Page Size</param>
         /// <param name="pageNo">Number of the page</param>
         /// <param name="totalProcessorTime">Total Processor Time in seconds</param>
-        /// <returns></returns>
+        /// <returns>Tuple (Number of pages, Current page of List of MemoryItemProcess)</returns>
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectTotalProcessorTimeGreaterThan(
             int pageSize, int pageNo, double totalProcessorTime)
         {
