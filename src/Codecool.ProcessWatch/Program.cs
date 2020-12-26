@@ -10,9 +10,31 @@ namespace Codecool.ProcessWatch
     {
         public static void Main()
         {
+            while (true)
+            {
+                Console.WriteLine("Write number:");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    Console.Clear();
+                    Menu(number);
+                }
+                
+                Console.WriteLine("Write process ID:");
+                string inputId = Console.ReadLine();
+                if (Int32.TryParse(inputId, out var processId))
+                {
+                    Console.Clear();
+                    ProcessWatchApplication.KillProcess(processId);
+                }
+            }
+        }
+
+        private static void Menu(int pageNo)
+        {
             int pageSize = 20;
 
-            var pagination = ProcessWatchApplication.SelectProcessesByNamePagination(pageSize, 1, "we");
+            var pagination = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, "chro");
 
             StringBuilder sb = new StringBuilder();
 
