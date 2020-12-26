@@ -26,7 +26,7 @@ namespace Codecool.ProcessWatch
         {
             int pageSize = 20;
 
-            var pagination = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
+            var pagination = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(pageSize, pageNo, 60);
 
             StringBuilder sb = new StringBuilder();
 

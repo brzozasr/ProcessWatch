@@ -4,6 +4,24 @@
         <name>Codecool.ProcessWatch</name>
     </assembly>
     <members>
+        <member name="M:Codecool.ProcessWatch.Controller.ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(System.Int32,System.Int32,System.Double)">
+            <summary>
+            
+            </summary>
+            <param name="pageSize">Page Size</param>
+            <param name="pageNo">Number of the page</param>
+            <param name="physicalMemoryUsage">Physical memory usage in MB</param>
+            <returns></returns>
+        </member>
+        <member name="M:Codecool.ProcessWatch.Controller.ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(System.Int32,System.Int32,System.Double)">
+            <summary>
+            
+            </summary>
+            <param name="pageSize">Page Size</param>
+            <param name="pageNo">Number of the page</param>
+            <param name="userProcessorTime">User Processor Time in seconds</param>
+            <returns></returns>
+        </member>
         <member name="T:Codecool.ProcessWatch.Model.MemoryItemProcess">
             <summary>
             Model of the memory processes

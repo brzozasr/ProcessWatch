@@ -171,6 +171,66 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="physicalMemoryUsage">Physical memory usage in MB</param>
+        /// <returns></returns>
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectPhysicalMemoryUsageGreaterThan(
+            int pageSize, int pageNo, double physicalMemoryUsage)
+        {
+            long convertToBytes = (long) physicalMemoryUsage * 1024 * 1024;
+
+            var searchedList = _allMemoryItemProcesses
+                .Where(x => x.PhysicalMemoryUsage != null
+                            && x.PhysicalMemoryUsage.Value > convertToBytes).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedList);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="userProcessorTime">User Processor Time in seconds</param>
+        /// <returns></returns>
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectUserProcessorTimeGreaterThan(
+            int pageSize, int pageNo, double userProcessorTime)
+        {
+            double convertToMilliseconds = userProcessorTime * 1000;
+
+            var searchedList = _allMemoryItemProcesses
+                .Where(x => x.UserProcessorTime != null
+                            && x.UserProcessorTime.Value > convertToMilliseconds).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedList);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pageSize">Page Size</param>
+        /// <param name="pageNo">Number of the page</param>
+        /// <param name="totalProcessorTime">Total Processor Time in seconds</param>
+        /// <returns></returns>
+        public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectTotalProcessorTimeGreaterThan(
+            int pageSize, int pageNo, double totalProcessorTime)
+        {
+            double convertToMilliseconds = totalProcessorTime * 1000;
+
+            var searchedList = _allMemoryItemProcesses
+                .Where(x => x.TotalProcessorTime != null
+                            && x.TotalProcessorTime.Value > convertToMilliseconds).ToList();
+
+
+            return ProcessesPagination(pageSize, pageNo, searchedList);
+        }
 
         private static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) ProcessesPagination(
             int pageSize, int pageNo, List<MemoryItemProcess> listProcesses)

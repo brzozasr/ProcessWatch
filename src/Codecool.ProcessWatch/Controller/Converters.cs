@@ -33,7 +33,11 @@ namespace Codecool.ProcessWatch.Controller
         {
             if (totalMilliseconds.HasValue)
             {
-                if (totalMilliseconds.Value >= 1000)
+                if (totalMilliseconds.Value >= 1000 * 60)
+                {
+                    return (totalMilliseconds.Value / 1000 / 60).ToString("0.## min");
+                }
+                else if (totalMilliseconds.Value >= 1000)
                 {
                     return (totalMilliseconds.Value / 1000).ToString("0.## s");
                 }
