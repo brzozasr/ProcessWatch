@@ -22,6 +22,15 @@
             <param name="userProcessorTime">User Processor Time in seconds</param>
             <returns></returns>
         </member>
+        <member name="M:Codecool.ProcessWatch.Controller.ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(System.Int32,System.Int32,System.Double)">
+            <summary>
+            
+            </summary>
+            <param name="pageSize">Page Size</param>
+            <param name="pageNo">Number of the page</param>
+            <param name="totalProcessorTime">Total Processor Time in seconds</param>
+            <returns></returns>
+        </member>
         <member name="T:Codecool.ProcessWatch.Model.MemoryItemProcess">
             <summary>
             Model of the memory processes

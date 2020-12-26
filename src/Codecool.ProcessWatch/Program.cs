@@ -19,6 +19,14 @@ namespace Codecool.ProcessWatch
                     Console.Clear();
                     Menu(number);
                 }
+                
+                Console.WriteLine("Write process ID:");
+                string inputId = Console.ReadLine();
+                if (Int32.TryParse(inputId, out var processId))
+                {
+                    Console.Clear();
+                    ProcessWatchApplication.KillProcess(processId);
+                }
             }
         }
 
@@ -26,7 +34,7 @@ namespace Codecool.ProcessWatch
         {
             int pageSize = 20;
 
-            var pagination = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(pageSize, pageNo, 60);
+            var pagination = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, "chro");
 
             StringBuilder sb = new StringBuilder();
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Codecool.ProcessWatch.Model;
@@ -9,6 +10,7 @@ namespace Codecool.ProcessWatch.Controller
 {
     public static class ProcessWatchApplication
     {
+        public static List<MemoryItemProcess> TmpList { get; private set; }
         private static List<MemoryItemProcess> _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
         
         public static void RefreshAllMemoryItemProcesses()
@@ -232,6 +234,40 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedList);
         }
 
+        public static void KillProcess(int id)
+        {
+            try
+            {
+                Process.GetProcessById(id).Kill();
+                RefreshAllMemoryItemProcesses();
+                Console.WriteLine($"Process with an Id of {id} was killed.");
+            }
+            catch (Exception e)
+            {
+                RefreshAllMemoryItemProcesses();
+                Console.WriteLine(e.Message);
+            }
+        }
+        
+        public static void KillProcesses(List<MemoryItemProcess> tmpList)
+        {
+            if (tmpList.Count > 0)
+            {
+                tmpList.ForEach(x =>
+                {
+                    if (x.ProcessId.HasValue)
+                    {
+                        KillProcess(x.ProcessId.Value);
+                    }
+                });
+            }
+            else
+            {
+                Console.WriteLine("There are no processes to kill.");
+            }
+            
+        }
+
         private static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) ProcessesPagination(
             int pageSize, int pageNo, List<MemoryItemProcess> listProcesses)
         {
@@ -248,10 +284,14 @@ namespace Codecool.ProcessWatch.Controller
                 // var processesPage = listProcesses.OrderBy(x => x.ProcessId).
                 //     Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 
+                TmpList = new List<MemoryItemProcess>(processesPage);
+
                 return ((int) numberOfPages, processesPage);
             }
 
             var emptyList = new List<MemoryItemProcess>();
+            TmpList = new List<MemoryItemProcess>(emptyList);
+            
             return (0, emptyList);
         }
 
