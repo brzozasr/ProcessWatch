@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
+using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.Model;
 
 namespace Codecool.ProcessWatch
@@ -18,15 +19,12 @@ namespace Codecool.ProcessWatch
                 {
                     Console.Clear();
                     Menu(number);
+
+                    StartGui win = new StartGui();
+                    
                 }
                 
-                Console.WriteLine("Write process ID:");
-                string inputId = Console.ReadLine();
-                if (Int32.TryParse(inputId, out var processId))
-                {
-                    Console.Clear();
-                    ProcessWatchApplication.KillProcess(processId);
-                }
+                
             }
         }
 
