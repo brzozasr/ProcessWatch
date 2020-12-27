@@ -1,8 +1,8 @@
 namespace Codecool.ProcessWatch.GUI
 {
-    public class ColumnName : Gtk.TreeNode
+    public class RowData : Gtk.TreeNode
     {
-        [field: Gtk.TreeNodeValue(Column = 0)] public string ProcessId;
+        [Gtk.TreeNodeValue(Column = 0)] public string ProcessId { get; }
 
         [Gtk.TreeNodeValue(Column = 1)] public string ProcessTitle { get; }
 
@@ -22,7 +22,7 @@ namespace Codecool.ProcessWatch.GUI
 
         [Gtk.TreeNodeValue(Column = 9)] public string BasePriorityNo { get; }
 
-        public ColumnName(string processId, string processTitle, string memoryUsage,
+        public RowData(string processId, string processTitle, string memoryUsage,
             string priority, string userCpuTime, string privilegedCpuTime, string totalCpuTime,
             string threadsNo, string startedTime, string basePriorityNo)
         {

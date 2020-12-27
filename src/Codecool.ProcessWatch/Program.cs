@@ -4,6 +4,7 @@ using System.Text;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.Model;
+using Gtk;
 
 namespace Codecool.ProcessWatch
 {
@@ -19,13 +20,15 @@ namespace Codecool.ProcessWatch
                 {
                     Console.Clear();
                     GetMenu(number);
+
+                    StartGui win = new StartGui();
                 }
             }
         }
 
         private static void GetMenu(int pageNo)
         {
-            int pageSize = 20;
+            int pageSize = 25;
 
             var pagination = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
 

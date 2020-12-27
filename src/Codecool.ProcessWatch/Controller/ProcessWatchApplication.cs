@@ -11,6 +11,7 @@ namespace Codecool.ProcessWatch.Controller
     public static class ProcessWatchApplication
     {
         public static List<MemoryItemProcess> TmpList { get; private set; }
+        public static int TmpNumberOfPages { get; private set; }
         private static List<MemoryItemProcess> _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
         
         public static void RefreshAllMemoryItemProcesses()
@@ -341,12 +342,14 @@ namespace Codecool.ProcessWatch.Controller
                 //     Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 
                 TmpList = new List<MemoryItemProcess>(processesPage);
+                TmpNumberOfPages = (int) numberOfPages;
 
                 return ((int) numberOfPages, processesPage);
             }
 
             var emptyList = new List<MemoryItemProcess>();
             TmpList = new List<MemoryItemProcess>(emptyList);
+            TmpNumberOfPages = 0;
             
             return (0, emptyList);
         }
