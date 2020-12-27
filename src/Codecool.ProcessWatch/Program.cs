@@ -13,26 +13,21 @@ namespace Codecool.ProcessWatch
         {
             while (true)
             {
-                Console.WriteLine("Write number:");
+                Console.WriteLine("Write number of page:");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
                     Console.Clear();
-                    Menu(number);
-
-                    StartGui win = new StartGui();
-                    
+                    GetMenu(number);
                 }
-                
-                
             }
         }
 
-        private static void Menu(int pageNo)
+        private static void GetMenu(int pageNo)
         {
             int pageSize = 20;
 
-            var pagination = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, "chro");
+            var pagination = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
 
             StringBuilder sb = new StringBuilder();
 
