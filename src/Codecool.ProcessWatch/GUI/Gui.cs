@@ -8,45 +8,19 @@ namespace Codecool.ProcessWatch.GUI
 {
     public class Gui : Window
     {
-        NodeStore store;
+        private NodeStore _store;
         private const int PageSize = 25;
         private List<MemoryItemProcess> _processesList = new List<MemoryItemProcess>();
-        private int _numberOfPages = 0;
-        
-
-        /*NodeStore Store
-        {
-            get
-            {
-                if (store == null)
-                {
-                    int pageSize = 25;
-                    store = new NodeStore(typeof(ColumnName));
-                    
-                    foreach (var p in ProcessWatchApplication.AllProcesses(pageSize, 1).ProcessesList)
-                    {
-                        store.AddNode(new ColumnName(
-                            Converters.IntNullConverter(p.ProcessId), 
-                            Converters.StrNullConverter(p.ProcessName),
-                        Converters.ByteConverter(p.PhysicalMemoryUsage),
-                            Converters.StrNullConverter(p.PriorityClass),
-                            Converters.TimeConverter(p.UserProcessorTime),
-                            Converters.TimeConverter(p.PrivilegedProcessorTime),
-                            Converters.TimeConverter(p.TotalProcessorTime),
-                            Converters.IntNullConverter(p.ThreadsNumber),
-                            Converters.DateTimeNullConverter(p.StartTime),
-                            Converters.IntNullConverter(p.BasePriority)));
-                    }
-                }
-
-                return store;
-            }
-        }*/
+        private int _numberOfPages;
+        private int _pageNo;
+        private readonly Label _pageNoLbl;
+        private readonly Button _previousBtn;
+        private readonly Button _nextBtn;
 
         public Gui() : base("Process Watch")
         {
             SetPosition(WindowPosition.Center);
-            SetSizeRequest(750, 500);
+            SetSizeRequest(800, 500);
             // this.TypeHint = Gdk.WindowTypeHint.Normal;
             this.Resizable = true;
 
@@ -54,13 +28,13 @@ namespace Codecool.ProcessWatch.GUI
 
             CellRendererText rightAlignment = new CellRendererText();
             rightAlignment.SetAlignment(1.0f, 1.0f);
-            
+
             CellRendererText centerAlignment = new CellRendererText();
             centerAlignment.SetAlignment(0.5f, 0.5f);
 
             CellRendererText leftAlignment = new CellRendererText();
             leftAlignment.SetAlignment(0.0f, 0.0f);
-            
+
             NodeView view = new NodeView(GetNodeStoreStore());
             view.AppendColumn("PID", rightAlignment, "text", 0);
             view.AppendColumn("Name", leftAlignment, "text", 1);
@@ -80,18 +54,35 @@ namespace Codecool.ProcessWatch.GUI
             // {
             //     Gtk.Application.RunIteration();
             // }
-            
+
             VBox mainVBox = new VBox(false, 0);
             HBox naviBtnHBox = new HBox(false, 10);
 
-            Button previousBtn = new Button("<<");
-            Label pageNoLbl = new Label($"1 of {_numberOfPages}");
-            pageNoLbl.SetSizeRequest(60, 30);
-            Button nextBtn = new Button(">>");
+            _previousBtn = new Button("<<");
+            _pageNoLbl = new Label($"{_pageNo} of {_numberOfPages}");
+            _pageNoLbl.SetSizeRequest(60, 30);
+            _nextBtn = new Button(">>");
 
-            naviBtnHBox.Add(previousBtn);
-            naviBtnHBox.Add(pageNoLbl);
-            naviBtnHBox.Add(nextBtn);
+            if (_pageNo <= 1 && _numberOfPages <= 1)
+            {
+                _previousBtn.Sensitive = false;
+                _nextBtn.Sensitive = false;
+            }
+            else if (_pageNo == 1)
+            {
+                _previousBtn.Sensitive = false;
+            }
+            else if (_pageNo == _numberOfPages)
+            {
+                _nextBtn.Sensitive = false;
+            }
+
+            _previousBtn.Clicked += OnClickPreviousBtn;
+            _nextBtn.Clicked += OnClickNextBtn;
+
+            naviBtnHBox.Add(_previousBtn);
+            naviBtnHBox.Add(_pageNoLbl);
+            naviBtnHBox.Add(_nextBtn);
 
             Alignment naviBtnAlignment = new Alignment(0.5f, 0, 0, 0);
             naviBtnAlignment.Add(naviBtnHBox);
@@ -101,6 +92,46 @@ namespace Codecool.ProcessWatch.GUI
 
             Add(mainVBox);
             ShowAll();
+        }
+
+        private void OnClickPreviousBtn(object sender, EventArgs e)
+        {
+            RemoveAllDataView();
+            _pageNo -= 1;
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+
+        private void OnClickNextBtn(object sender, EventArgs e)
+        {
+            RemoveAllDataView();
+            _pageNo += 1;
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+
+        private void SetNaviBtnSensitive()
+        {
+            if (_pageNo <= 1 && _numberOfPages <= 1)
+            {
+                _previousBtn.Sensitive = false;
+                _nextBtn.Sensitive = false;
+            }
+            else if (_pageNo == 1)
+            {
+                _previousBtn.Sensitive = false;
+            }
+            else if (_pageNo == _numberOfPages)
+            {
+                _nextBtn.Sensitive = false;
+            }
+            else
+            {
+                _previousBtn.Sensitive = true;
+                _nextBtn.Sensitive = true;
+            }
         }
 
         private void AppQuit(object o, DeleteEventArgs args)
@@ -114,22 +145,22 @@ namespace Codecool.ProcessWatch.GUI
 
         private NodeStore GetNodeStoreStore()
         {
-            _processesList = ProcessWatchApplication.TmpList;
-            _numberOfPages = ProcessWatchApplication.TmpNumberOfPages;
-
             if (_processesList.Count == 0)
             {
-                _processesList = ProcessWatchApplication.AllProcesses(PageSize, 1).ProcessesList;
+                _pageNo = 1;
+                var processesData = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
+                _processesList = processesData.ProcessesList;
+                _numberOfPages = processesData.NumberOfPages;
             }
 
-            if (store == null)
+            if (_store == null)
             {
-                store = new NodeStore(typeof(RowData));
+                _store = new NodeStore(typeof(RowData));
 
 
                 foreach (var p in _processesList)
                 {
-                    store.AddNode(new RowData(
+                    _store.AddNode(new RowData(
                         Converters.IntNullConverter(p.ProcessId),
                         Converters.StrNullConverter(p.ProcessName),
                         Converters.ByteConverter(p.PhysicalMemoryUsage),
@@ -143,7 +174,32 @@ namespace Codecool.ProcessWatch.GUI
                 }
             }
 
-            return store;
+            return _store;
+        }
+
+        private void RemoveAllDataView()
+        {
+            _store.Clear();
+        }
+
+        private void RefreshView()
+        {
+            _processesList = ProcessWatchApplication.AllProcesses(PageSize, _pageNo).ProcessesList;
+            
+            foreach (var p in _processesList)
+            {
+                _store.AddNode(new RowData(
+                    Converters.IntNullConverter(p.ProcessId),
+                    Converters.StrNullConverter(p.ProcessName),
+                    Converters.ByteConverter(p.PhysicalMemoryUsage),
+                    Converters.StrNullConverter(p.PriorityClass),
+                    Converters.TimeConverter(p.UserProcessorTime),
+                    Converters.TimeConverter(p.PrivilegedProcessorTime),
+                    Converters.TimeConverter(p.TotalProcessorTime),
+                    Converters.IntNullConverter(p.ThreadsNumber),
+                    Converters.DateTimeNullConverter(p.StartTime),
+                    Converters.IntNullConverter(p.BasePriority)));
+            }
         }
     }
 }
