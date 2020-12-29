@@ -208,6 +208,9 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startBeforeDateDaySb);
             _topRightHBox.Add(_startBeforeDateMonthSb);
             _topRightHBox.Add(_startBeforeDateYearSb);
+            _startBeforeDateDaySb.Changed += OnChangeBeforeDateDay;
+            _startBeforeDateMonthSb.Changed += OnChangeBeforeDateMonth;
+            _startBeforeDateYearSb.Changed += OnChangeBeforeDateYear;
 
             _startAfterDateDaySb = new SpinButton(1, 31, 1);
             _startAfterDateDaySb.Value = DateTime.Now.Day;
@@ -331,10 +334,13 @@ namespace Codecool.ProcessWatch.GUI
                     InitProcessesAtMonth();
                     break;
                 case "- processes started before date":
+                    _filterType = "ProcessesStarBeforeDate";
                     HideAllWidgets();
+                    _pageNo = 1;
                     _startBeforeDateDaySb.Visible = true;
                     _startBeforeDateMonthSb.Visible = true;
                     _startBeforeDateYearSb.Visible = true;
+                    InitProcessesBeforeDate();
                     break;
                 case "- processes started after date":
                     HideAllWidgets();
@@ -473,6 +479,21 @@ namespace Codecool.ProcessWatch.GUI
         {
             OnChangeCommonMethod();
         }
+        
+        private void OnChangeBeforeDateDay(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
+
+        private void OnChangeBeforeDateMonth(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
+
+        private void OnChangeBeforeDateYear(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
 
         private void InitAllProcesses()
         {
@@ -564,6 +585,28 @@ namespace Codecool.ProcessWatch.GUI
                 (int) _startAtMonthSb.Value);
             _processesList = processesStartAtMonth.ProcessesList;
             _numberOfPages = processesStartAtMonth.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void InitProcessesBeforeDate()
+        {
+            RemoveAllDataView();
+            var processesStartBeforeDate = ProcessWatchApplication.SelectProcessesStartBeforeDate(PageSize, _pageNo,
+                day: (int) _startBeforeDateDaySb.Value, month: (int) _startBeforeDateMonthSb.Value,
+                year: (int) _startBeforeDateYearSb.Value);
+            _processesList = processesStartBeforeDate.ProcessesList;
+            _numberOfPages = processesStartBeforeDate.NumberOfPages;
             if (_numberOfPages == 0)
             {
                 _pageNoLbl.Text = $"0 of {_numberOfPages}";
@@ -722,6 +765,13 @@ namespace Codecool.ProcessWatch.GUI
                         (int) _startAtMonthSb.Value);
                     _processesList = processesStartAtMonth.ProcessesList;
                     _numberOfPages = processesStartAtMonth.NumberOfPages;
+                    break;
+                case "ProcessesStarBeforeDate":
+                    var processesStartBeforeDate = ProcessWatchApplication.SelectProcessesStartBeforeDate(PageSize, _pageNo,
+                        day: (int) _startBeforeDateDaySb.Value, month: (int) _startBeforeDateMonthSb.Value,
+                        year: (int) _startBeforeDateYearSb.Value);
+                    _processesList = processesStartBeforeDate.ProcessesList;
+                    _numberOfPages = processesStartBeforeDate.NumberOfPages;
                     break;
                 default:
                     var processesDefault = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
