@@ -224,6 +224,9 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startAfterDateDaySb);
             _topRightHBox.Add(_startAfterDateMonthSb);
             _topRightHBox.Add(_startAfterDateYearSb);
+            _startAfterDateDaySb.Changed += OnChangeAfterDateDay;
+            _startAfterDateMonthSb.Changed += OnChangeAfterDateMonth;
+            _startAfterDateYearSb.Changed += OnChangeAfterDateYear;
 
             Adjustment memory = new Adjustment(1.0, 0.0001, 99999.9999, 0.01, 1, 1);
             _memoryUsageSb = new SpinButton(memory, 0.0, 4);
@@ -255,7 +258,7 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_totalCpuTimeLbl);
             _totalCpuTimeSb.Changed += OnChangeTotalCpuTime;
         }
-
+        
         private void HideAllWidgets()
         {
             _searchEntry.Visible = false;
@@ -343,10 +346,13 @@ namespace Codecool.ProcessWatch.GUI
                     InitProcessesBeforeDate();
                     break;
                 case "- processes started after date":
+                    _filterType = "ProcessesStarAfterDate";
                     HideAllWidgets();
+                    _pageNo = 1;
                     _startAfterDateDaySb.Visible = true;
                     _startAfterDateMonthSb.Visible = true;
                     _startAfterDateYearSb.Visible = true;
+                    InitProcessesAfterDate();
                     break;
                 case "- processes physical memory usage greater than...":
                     HideAllWidgets();
@@ -494,6 +500,21 @@ namespace Codecool.ProcessWatch.GUI
         {
             OnChangeCommonMethod();
         }
+        
+        private void OnChangeAfterDateDay(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
+
+        private void OnChangeAfterDateMonth(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
+
+        private void OnChangeAfterDateYear(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
 
         private void InitAllProcesses()
         {
@@ -607,6 +628,28 @@ namespace Codecool.ProcessWatch.GUI
                 year: (int) _startBeforeDateYearSb.Value);
             _processesList = processesStartBeforeDate.ProcessesList;
             _numberOfPages = processesStartBeforeDate.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void InitProcessesAfterDate()
+        {
+            RemoveAllDataView();
+            var processesStartAfterDate = ProcessWatchApplication.SelectProcessesStartAfterDate(PageSize, _pageNo,
+                day: (int) _startAfterDateDaySb.Value, month: (int) _startAfterDateMonthSb.Value,
+                year: (int) _startAfterDateYearSb.Value);
+            _processesList = processesStartAfterDate.ProcessesList;
+            _numberOfPages = processesStartAfterDate.NumberOfPages;
             if (_numberOfPages == 0)
             {
                 _pageNoLbl.Text = $"0 of {_numberOfPages}";
@@ -772,6 +815,13 @@ namespace Codecool.ProcessWatch.GUI
                         year: (int) _startBeforeDateYearSb.Value);
                     _processesList = processesStartBeforeDate.ProcessesList;
                     _numberOfPages = processesStartBeforeDate.NumberOfPages;
+                    break;
+                case "ProcessesStarAfterDate":
+                    var processesStartAfterDate = ProcessWatchApplication.SelectProcessesStartAfterDate(PageSize, _pageNo,
+                        day: (int) _startAfterDateDaySb.Value, month: (int) _startAfterDateMonthSb.Value,
+                        year: (int) _startAfterDateYearSb.Value);
+                    _processesList = processesStartAfterDate.ProcessesList;
+                    _numberOfPages = processesStartAfterDate.NumberOfPages;
                     break;
                 default:
                     var processesDefault = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
