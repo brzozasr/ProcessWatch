@@ -188,6 +188,7 @@ namespace Codecool.ProcessWatch.GUI
             _startAtDaySb.Value = DateTime.Now.Day;
             _startAtDaySb.Visible = false;
             _topRightHBox.Add(_startAtDaySb);
+            _startAtDaySb.Changed += OnChangeAtDay;
 
             _startAtMonthSb = new SpinButton(1, 12, 1);
             _startAtMonthSb.Value = DateTime.Now.Month;
@@ -251,7 +252,7 @@ namespace Codecool.ProcessWatch.GUI
             _totalCpuTimeSb.Changed += OnChangeTotalCpuTime;
         }
         
-
+        
         private void HideAllWidgets()
         {
             _searchEntry.Visible = false;
@@ -316,8 +317,11 @@ namespace Codecool.ProcessWatch.GUI
                     InitProcessesAtDate();
                     break;
                 case "- processes started at day":
+                    _filterType = "ProcessesStartAtDay";
                     HideAllWidgets();
                     _startAtDaySb.Visible = true;
+                    _pageNo = 1;
+                    InitProcessesAtDay();
                     break;
                 case "- processes started at month":
                     HideAllWidgets();
@@ -456,6 +460,11 @@ namespace Codecool.ProcessWatch.GUI
         {
             OnChangeCommonMethod();
         }
+        
+        private void OnChangeAtDay(object sender, EventArgs e)
+        {
+            OnChangeCommonMethod();
+        }
 
         private void InitAllProcesses()
         {
@@ -505,6 +514,27 @@ namespace Codecool.ProcessWatch.GUI
                 (int) _startAtDateYearSb.Value);
             _processesList = processesStartAtDate.ProcessesList;
             _numberOfPages = processesStartAtDate.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void InitProcessesAtDay()
+        {
+            RemoveAllDataView();
+            var processesStartAtDay = ProcessWatchApplication.SelectProcessesStartAtDay(PageSize, _pageNo,
+                (int) _startAtDaySb.Value);
+            _processesList = processesStartAtDay.ProcessesList;
+            _numberOfPages = processesStartAtDay.NumberOfPages;
             if (_numberOfPages == 0)
             {
                 _pageNoLbl.Text = $"0 of {_numberOfPages}";
@@ -651,6 +681,12 @@ namespace Codecool.ProcessWatch.GUI
                         (int) _startAtDateYearSb.Value);
                     _processesList = processesStartAtDate.ProcessesList;
                     _numberOfPages = processesStartAtDate.NumberOfPages;
+                    break;
+                case "ProcessesStartAtDay":
+                    var processesStartAtDay = ProcessWatchApplication.SelectProcessesStartAtDay(PageSize, _pageNo,
+                        (int) _startAtDaySb.Value);
+                    _processesList = processesStartAtDay.ProcessesList;
+                    _numberOfPages = processesStartAtDay.NumberOfPages;
                     break;
                 default:
                     var processesDefault = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
