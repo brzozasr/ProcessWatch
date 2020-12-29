@@ -34,6 +34,10 @@ namespace Codecool.ProcessWatch.GUI
         private SpinButton _startAfterDateYearSb;
         private SpinButton _memoryUsageSb;
         private Label _memoryUsageLbl;
+        private SpinButton _userCpuTimeSb;
+        private Label _userCpuTimeLbl;
+        private SpinButton _totalCpuTimeSb;
+        private Label _totalCpuTimeLbl;
 
         public Gui() : base("Process Watch - GUI")
         {
@@ -216,15 +220,37 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startAfterDateMonthSb);
             _topRightHBox.Add(_startAfterDateYearSb);
 
-            Adjustment memory = new Adjustment(1.0, 0.0001, 99999.9999, 1, 1, 1);
+            Adjustment memory = new Adjustment(1.0, 0.0001, 99999.9999, 0.01, 1, 1);
             _memoryUsageSb = new SpinButton(memory, 0.0, 4);
             _memoryUsageSb.Numeric = true;
             _memoryUsageSb.Visible = false;
             _memoryUsageLbl = new Label("  1 MB");
+            _memoryUsageLbl.Visible = false;
             _topRightHBox.Add(_memoryUsageSb);
             _topRightHBox.Add(_memoryUsageLbl);
             _memoryUsageSb.Changed += OnChangeMemoryUsage;
+
+            Adjustment userCpu = new Adjustment(1.0, 0.001, 99999.999, 0.01, 1, 1);
+            _userCpuTimeSb = new SpinButton(userCpu, 0.0, 3);
+            _userCpuTimeSb.Numeric = true;
+            _userCpuTimeSb.Visible = false;
+            _userCpuTimeLbl = new Label("  1 s");
+            _userCpuTimeLbl.Visible = false;
+            _topRightHBox.Add(_userCpuTimeSb);
+            _topRightHBox.Add(_userCpuTimeLbl);
+            _userCpuTimeSb.Changed += OnChangeUserCpuTime;
+            
+            Adjustment totalCpu = new Adjustment(1.0, 0.001, 99999.999, 0.01, 1, 1);
+            _totalCpuTimeSb = new SpinButton(totalCpu, 0.0, 3);
+            _totalCpuTimeSb.Numeric = true;
+            _totalCpuTimeSb.Visible = false;
+            _totalCpuTimeLbl = new Label("  1 s");
+            _totalCpuTimeLbl.Visible = false;
+            _topRightHBox.Add(_totalCpuTimeSb);
+            _topRightHBox.Add(_totalCpuTimeLbl);
+            _totalCpuTimeSb.Changed += OnChangeTotalCpuTime;
         }
+        
 
         private void HideAllWidgets()
         {
@@ -248,6 +274,12 @@ namespace Codecool.ProcessWatch.GUI
 
             _memoryUsageSb.Visible = false;
             _memoryUsageLbl.Visible = false;
+            
+            _userCpuTimeSb.Visible = false;
+            _userCpuTimeLbl.Visible = false;
+            
+            _totalCpuTimeSb.Visible = false;
+            _totalCpuTimeLbl.Visible = false;
         }
 
         private void OnChanged(object sender, EventArgs e)
@@ -310,9 +342,13 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes user CPU time greater than...":
                     HideAllWidgets();
+                    _userCpuTimeSb.Visible = true;
+                    _userCpuTimeLbl.Visible = true;
                     break;
                 case "- processes total CPU time greater than...":
                     HideAllWidgets();
+                    _totalCpuTimeSb.Visible = true;
+                    _totalCpuTimeLbl.Visible = true;
                     break;
                 default:
                     HideAllWidgets();
@@ -368,6 +404,42 @@ namespace Codecool.ProcessWatch.GUI
             }
 
             _memoryUsageLbl.Text = txt;
+        }
+        
+        private void OnChangeUserCpuTime(object sender, EventArgs e)
+        {
+            string txt = "";
+            double time = _userCpuTimeSb.Value;
+
+            if (time >= 1)
+            {
+                txt = $"  {Math.Round(time, 2)} s";
+            }
+            else if (time < 1)
+            {
+                time = time * 1000;
+                txt = $"  {Math.Round(time, 2)} ms";
+            }
+
+            _userCpuTimeLbl.Text = txt;
+        }
+        
+        private void OnChangeTotalCpuTime(object sender, EventArgs e)
+        {
+            string txt = "";
+            double time = _totalCpuTimeSb.Value;
+
+            if (time >= 1)
+            {
+                txt = $"  {Math.Round(time, 2)} s";
+            }
+            else if (time < 1)
+            {
+                time = time * 1000;
+                txt = $"  {Math.Round(time, 2)} ms";
+            }
+
+            _totalCpuTimeLbl.Text = txt;
         }
 
         private void OnChangeAtDateYear(object sender, EventArgs e)
