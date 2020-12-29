@@ -355,9 +355,12 @@ namespace Codecool.ProcessWatch.GUI
                     InitProcessesAfterDate();
                     break;
                 case "- processes physical memory usage greater than...":
+                    _filterType = "ProcessesPhysicalMemoryUsage";
                     HideAllWidgets();
+                    _pageNo = 1;
                     _memoryUsageSb.Visible = true;
                     _memoryUsageLbl.Visible = true;
+                    InitPhysicalMemoryUsage();
                     break;
                 case "- processes user CPU time greater than...":
                     HideAllWidgets();
@@ -423,6 +426,8 @@ namespace Codecool.ProcessWatch.GUI
             }
 
             _memoryUsageLbl.Text = txt;
+            
+            OnChangeCommonMethod();
         }
         
         private void OnChangeUserCpuTime(object sender, EventArgs e)
@@ -663,6 +668,27 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
+        
+        private void InitPhysicalMemoryUsage()
+        {
+            RemoveAllDataView();
+            var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(PageSize, _pageNo,
+                _memoryUsageSb.Value);
+            _processesList = processesPhysicalMemoryUsage.ProcessesList;
+            _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
 
         private void OnClickPreviousBtn(object sender, EventArgs e)
         {
@@ -822,6 +848,12 @@ namespace Codecool.ProcessWatch.GUI
                         year: (int) _startAfterDateYearSb.Value);
                     _processesList = processesStartAfterDate.ProcessesList;
                     _numberOfPages = processesStartAfterDate.NumberOfPages;
+                    break;
+                case "ProcessesPhysicalMemoryUsage":
+                    var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(PageSize, _pageNo,
+                        _memoryUsageSb.Value);
+                    _processesList = processesPhysicalMemoryUsage.ProcessesList;
+                    _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
                     break;
                 default:
                     var processesDefault = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
