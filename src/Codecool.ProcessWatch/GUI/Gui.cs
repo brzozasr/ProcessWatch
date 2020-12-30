@@ -410,92 +410,24 @@ namespace Codecool.ProcessWatch.GUI
 
         private void OnValueChangeMemoryUsage(object sender, EventArgs e)
         {
-            string txt = "";
-            double memory = _memoryUsageSb.Value;
-
-            if (memory > 1024 * 1024)
-            {
-                memory = memory / 1024 / 1024;
-                txt = $"  MB = {Math.Round(memory, 2)} TB";
-            }
-            else if (memory > 1024)
-            {
-                memory = memory / 1024;
-                txt = $"  MB = {Math.Round(memory, 2)} GB";
-            }
-            else if (memory >= 1 && memory <= 1024)
-            {
-                txt = $"  MB = {Math.Round(memory, 2)} MB";
-            }
-            else if (memory < 1)
-            {
-                memory = memory * 1024;
-                txt = $"  MB = {Math.Round(memory, 2)} kB";
-            }
-
-            _memoryUsageLbl.Text = txt;
+            double megaBytes = _memoryUsageSb.Value;
+            _memoryUsageLbl.Text = GuiUtilities.MegaByteConverter(megaBytes);
             
             OnChangeCommonMethod();
         }
         
         private void OnValueChangeUserCpuTime(object sender, EventArgs e)
         {
-            string txt = "";
-            double time = _userCpuTimeSb.Value;
-
-            time = Math.Round(time, 3);
-            Console.WriteLine(time);
-
-            if (time > 60 * 60)
-            {
-                double h = Math.Floor(time / 60 / 60);
-                double min = Math.Floor(time) % 60;
-                txt = $"  s = {h} h {Math.Round(min)} min";
-            }
-            else if (time >= 60)
-            {
-                double min = Math.Floor(Math.Floor(time) / 60);
-                double sec = Math.Floor(time) % 60;
-                double ms = (time - ((int) min * 60 + (int) sec)) * 1000;
-                txt = $"  s = {Math.Round(min)} min {sec} s {Math.Round(ms, 0)} ms";
-            }
-            else if (time >= 1)
-            {
-                double s = time;
-                txt = $"  s = {Math.Round(s, 2)} s";
-            }
-            else if (time < 1)
-            {
-                double ms = time * 1000;
-                txt = $"  s = {Math.Round(ms, 2)} ms";
-            }
-
-            _userCpuTimeLbl.Text = txt;
+            double seconds = _userCpuTimeSb.Value;
+            _userCpuTimeLbl.Text = GuiUtilities.SecondConverter(seconds);
             
             OnChangeCommonMethod();
         }
 
         private void OnValueChangeTotalCpuTime(object sender, EventArgs e)
         {
-            string txt = "";
-            double time = _totalCpuTimeSb.Value;
-
-            if (time >= 60)
-            {
-                time = time / 60;
-                txt = $"  s = {Math.Round(time, 2)} min";
-            }
-            else if (time >= 1)
-            {
-                txt = $"  s = {Math.Round(time, 2)} s";
-            }
-            else if (time < 1)
-            {
-                time = time * 1000;
-                txt = $"  s = {Math.Round(time, 2)} ms";
-            }
-
-            _totalCpuTimeLbl.Text = txt;
+            double seconds = _totalCpuTimeSb.Value;
+            _totalCpuTimeLbl.Text = GuiUtilities.SecondConverter(seconds);
             
             OnChangeCommonMethod();
         }
