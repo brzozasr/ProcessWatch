@@ -75,6 +75,7 @@ namespace Codecool.ProcessWatch.GUI
             leftAlignment.SetAlignment(0.0f, 0.0f);
 
             NodeView view = new NodeView(GetNodeStoreStore());
+            view.Selection.Mode = SelectionMode.Multiple;
             view.AppendColumn("PID", rightAlignment, "text", 0);
             view.AppendColumn("Name", leftAlignment, "text", 1);
             view.AppendColumn("Memory Usage", rightAlignment, "text", 2);
@@ -180,21 +181,21 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startAtDateDaySb);
             _topRightHBox.Add(_startAtDateMonthSb);
             _topRightHBox.Add(_startAtDateYearSb);
-            _startAtDateDaySb.Changed += OnChangeAtDateDay;
-            _startAtDateMonthSb.Changed += OnChangeAtDateMonth;
-            _startAtDateYearSb.Changed += OnChangeAtDateYear;
+            _startAtDateDaySb.ValueChanged += OnValueChangeAtDateDay;
+            _startAtDateMonthSb.ValueChanged += OnValueChangeAtDateMonth;
+            _startAtDateYearSb.ValueChanged += OnValueChangeAtDateYear;
 
             _startAtDaySb = new SpinButton(1, 31, 1);
             _startAtDaySb.Value = DateTime.Now.Day;
             _startAtDaySb.Visible = false;
             _topRightHBox.Add(_startAtDaySb);
-            _startAtDaySb.Changed += OnChangeAtDay;
+            _startAtDaySb.ValueChanged += OnValueChangeAtDay;
 
             _startAtMonthSb = new SpinButton(1, 12, 1);
             _startAtMonthSb.Value = DateTime.Now.Month;
             _startAtMonthSb.Visible = false;
             _topRightHBox.Add(_startAtMonthSb);
-            _startAtMonthSb.Changed += OnChangeAtMonth;
+            _startAtMonthSb.ValueChanged += OnValueChangeAtMonth;
 
             _startBeforeDateDaySb = new SpinButton(1, 31, 1);
             _startBeforeDateDaySb.Value = DateTime.Now.Day;
@@ -208,9 +209,9 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startBeforeDateDaySb);
             _topRightHBox.Add(_startBeforeDateMonthSb);
             _topRightHBox.Add(_startBeforeDateYearSb);
-            _startBeforeDateDaySb.Changed += OnChangeBeforeDateDay;
-            _startBeforeDateMonthSb.Changed += OnChangeBeforeDateMonth;
-            _startBeforeDateYearSb.Changed += OnChangeBeforeDateYear;
+            _startBeforeDateDaySb.ValueChanged += OnValueChangeBeforeDateDay;
+            _startBeforeDateMonthSb.ValueChanged += OnValueChangeBeforeDateMonth;
+            _startBeforeDateYearSb.ValueChanged += OnValueChangeBeforeDateYear;
 
             _startAfterDateDaySb = new SpinButton(1, 31, 1);
             _startAfterDateDaySb.Value = DateTime.Now.Day;
@@ -224,41 +225,42 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_startAfterDateDaySb);
             _topRightHBox.Add(_startAfterDateMonthSb);
             _topRightHBox.Add(_startAfterDateYearSb);
-            _startAfterDateDaySb.Changed += OnChangeAfterDateDay;
-            _startAfterDateMonthSb.Changed += OnChangeAfterDateMonth;
-            _startAfterDateYearSb.Changed += OnChangeAfterDateYear;
+            _startAfterDateDaySb.ValueChanged += OnValueChangeAfterDateDay;
+            _startAfterDateMonthSb.ValueChanged += OnValueChangeAfterDateMonth;
+            _startAfterDateYearSb.ValueChanged += OnValueChangeAfterDateYear;
 
             Adjustment memory = new Adjustment(1.0, 0.0001, 99999.9999, 0.01, 1, 1);
             _memoryUsageSb = new SpinButton(memory, 0.0, 4);
             _memoryUsageSb.Numeric = true;
             _memoryUsageSb.Visible = false;
-            _memoryUsageLbl = new Label("  1 MB");
+            _memoryUsageLbl = new Label("  MB = 1 MB");
             _memoryUsageLbl.Visible = false;
             _topRightHBox.Add(_memoryUsageSb);
             _topRightHBox.Add(_memoryUsageLbl);
-            _memoryUsageSb.Changed += OnChangeMemoryUsage;
+            _memoryUsageSb.ValueChanged += OnValueChangeMemoryUsage;
 
             Adjustment userCpu = new Adjustment(1.0, 0.001, 99999.999, 0.01, 1, 1);
             _userCpuTimeSb = new SpinButton(userCpu, 0.0, 3);
             _userCpuTimeSb.Numeric = true;
             _userCpuTimeSb.Visible = false;
-            _userCpuTimeLbl = new Label("  1 s");
+            _userCpuTimeLbl = new Label("  s = 1 s");
             _userCpuTimeLbl.Visible = false;
             _topRightHBox.Add(_userCpuTimeSb);
             _topRightHBox.Add(_userCpuTimeLbl);
-            _userCpuTimeSb.Changed += OnChangeUserCpuTime;
+            _userCpuTimeSb.ValueChanged += OnValueChangeUserCpuTime;
             
+
             Adjustment totalCpu = new Adjustment(1.0, 0.001, 99999.999, 0.01, 1, 1);
             _totalCpuTimeSb = new SpinButton(totalCpu, 0.0, 3);
             _totalCpuTimeSb.Numeric = true;
             _totalCpuTimeSb.Visible = false;
-            _totalCpuTimeLbl = new Label("  1 s");
+            _totalCpuTimeLbl = new Label("  s = 1 s");
             _totalCpuTimeLbl.Visible = false;
             _topRightHBox.Add(_totalCpuTimeSb);
             _topRightHBox.Add(_totalCpuTimeLbl);
-            _totalCpuTimeSb.Changed += OnChangeTotalCpuTime;
+            _totalCpuTimeSb.ValueChanged += OnValueChangeTotalCpuTime;
         }
-        
+
         private void HideAllWidgets()
         {
             _searchEntry.Visible = false;
@@ -363,14 +365,20 @@ namespace Codecool.ProcessWatch.GUI
                     InitPhysicalMemoryUsage();
                     break;
                 case "- processes user CPU time greater than...":
+                    _filterType = "ProcessesUserCpuTime";
                     HideAllWidgets();
+                    _pageNo = 1;
                     _userCpuTimeSb.Visible = true;
                     _userCpuTimeLbl.Visible = true;
+                    InitUserCpuTime();
                     break;
                 case "- processes total CPU time greater than...":
+                    _filterType = "ProcessesTotalCpuTime";
                     HideAllWidgets();
+                    _pageNo = 1;
                     _totalCpuTimeSb.Visible = true;
                     _totalCpuTimeLbl.Visible = true;
+                    InitTotalCpuTime();
                     break;
                 default:
                     HideAllWidgets();
@@ -400,7 +408,7 @@ namespace Codecool.ProcessWatch.GUI
             OnChangeCommonMethod();
         }
 
-        private void OnChangeMemoryUsage(object sender, EventArgs e)
+        private void OnValueChangeMemoryUsage(object sender, EventArgs e)
         {
             string txt = "";
             double memory = _memoryUsageSb.Value;
@@ -408,21 +416,21 @@ namespace Codecool.ProcessWatch.GUI
             if (memory > 1024 * 1024)
             {
                 memory = memory / 1024 / 1024;
-                txt = $"  {Math.Round(memory, 2)} TB";
+                txt = $"  MB = {Math.Round(memory, 2)} TB";
             }
             else if (memory > 1024)
             {
                 memory = memory / 1024;
-                txt = $"  {Math.Round(memory, 2)} GB";
+                txt = $"  MB = {Math.Round(memory, 2)} GB";
             }
             else if (memory >= 1 && memory <= 1024)
             {
-                txt = $"  {Math.Round(memory, 2)} MB";
+                txt = $"  MB = {Math.Round(memory, 2)} MB";
             }
             else if (memory < 1)
             {
                 memory = memory * 1024;
-                txt = $"  {Math.Round(memory, 2)} kB";
+                txt = $"  MB = {Math.Round(memory, 2)} kB";
             }
 
             _memoryUsageLbl.Text = txt;
@@ -430,93 +438,119 @@ namespace Codecool.ProcessWatch.GUI
             OnChangeCommonMethod();
         }
         
-        private void OnChangeUserCpuTime(object sender, EventArgs e)
+        private void OnValueChangeUserCpuTime(object sender, EventArgs e)
         {
             string txt = "";
             double time = _userCpuTimeSb.Value;
 
-            if (time >= 1)
+            time = Math.Round(time, 3);
+            Console.WriteLine(time);
+
+            if (time > 60 * 60)
             {
-                txt = $"  {Math.Round(time, 2)} s";
+                double h = Math.Floor(time / 60 / 60);
+                double min = Math.Floor(time) % 60;
+                txt = $"  s = {h} h {Math.Round(min)} min";
+            }
+            else if (time >= 60)
+            {
+                double min = Math.Floor(Math.Floor(time) / 60);
+                double sec = Math.Floor(time) % 60;
+                double ms = (time - ((int) min * 60 + (int) sec)) * 1000;
+                txt = $"  s = {Math.Round(min)} min {sec} s {Math.Round(ms, 0)} ms";
+            }
+            else if (time >= 1)
+            {
+                double s = time;
+                txt = $"  s = {Math.Round(s, 2)} s";
             }
             else if (time < 1)
             {
-                time = time * 1000;
-                txt = $"  {Math.Round(time, 2)} ms";
+                double ms = time * 1000;
+                txt = $"  s = {Math.Round(ms, 2)} ms";
             }
 
             _userCpuTimeLbl.Text = txt;
+            
+            OnChangeCommonMethod();
         }
-        
-        private void OnChangeTotalCpuTime(object sender, EventArgs e)
+
+        private void OnValueChangeTotalCpuTime(object sender, EventArgs e)
         {
             string txt = "";
             double time = _totalCpuTimeSb.Value;
 
-            if (time >= 1)
+            if (time >= 60)
             {
-                txt = $"  {Math.Round(time, 2)} s";
+                time = time / 60;
+                txt = $"  s = {Math.Round(time, 2)} min";
+            }
+            else if (time >= 1)
+            {
+                txt = $"  s = {Math.Round(time, 2)} s";
             }
             else if (time < 1)
             {
                 time = time * 1000;
-                txt = $"  {Math.Round(time, 2)} ms";
+                txt = $"  s = {Math.Round(time, 2)} ms";
             }
 
             _totalCpuTimeLbl.Text = txt;
+            
+            OnChangeCommonMethod();
         }
 
-        private void OnChangeAtDateYear(object sender, EventArgs e)
+        private void OnValueChangeAtDateYear(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeAtDateMonth(object sender, EventArgs e)
+        private void OnValueChangeAtDateMonth(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeAtDateDay(object sender, EventArgs e)
+        private void OnValueChangeAtDateDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
         
-        private void OnChangeAtDay(object sender, EventArgs e)
+        private void OnValueChangeAtDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
         
-        private void OnChangeAtMonth(object sender, EventArgs e)
+        private void OnValueChangeAtMonth(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
         
-        private void OnChangeBeforeDateDay(object sender, EventArgs e)
+        private void OnValueChangeBeforeDateDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeBeforeDateMonth(object sender, EventArgs e)
+        private void OnValueChangeBeforeDateMonth(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeBeforeDateYear(object sender, EventArgs e)
+        private void OnValueChangeBeforeDateYear(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
         
-        private void OnChangeAfterDateDay(object sender, EventArgs e)
+        private void OnValueChangeAfterDateDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeAfterDateMonth(object sender, EventArgs e)
+        private void OnValueChangeAfterDateMonth(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
 
-        private void OnChangeAfterDateYear(object sender, EventArgs e)
+        private void OnValueChangeAfterDateYear(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
@@ -676,6 +710,48 @@ namespace Codecool.ProcessWatch.GUI
                 _memoryUsageSb.Value);
             _processesList = processesPhysicalMemoryUsage.ProcessesList;
             _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void InitUserCpuTime()
+        {
+            RemoveAllDataView();
+            var processesUserCpuTime = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(PageSize, _pageNo,
+                _userCpuTimeSb.Value);
+            _processesList = processesUserCpuTime.ProcessesList;
+            _numberOfPages = processesUserCpuTime.NumberOfPages;
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
+
+            _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void InitTotalCpuTime()
+        {
+            RemoveAllDataView();
+            var processesTotalCpuTime = ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(PageSize, _pageNo,
+                _totalCpuTimeSb.Value);
+            _processesList = processesTotalCpuTime.ProcessesList;
+            _numberOfPages = processesTotalCpuTime.NumberOfPages;
             if (_numberOfPages == 0)
             {
                 _pageNoLbl.Text = $"0 of {_numberOfPages}";
@@ -854,6 +930,18 @@ namespace Codecool.ProcessWatch.GUI
                         _memoryUsageSb.Value);
                     _processesList = processesPhysicalMemoryUsage.ProcessesList;
                     _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
+                    break;
+                case "ProcessesUserCpuTime":
+                    var processesUserCpuTime = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(PageSize, _pageNo,
+                        _userCpuTimeSb.Value);
+                    _processesList = processesUserCpuTime.ProcessesList;
+                    _numberOfPages = processesUserCpuTime.NumberOfPages;
+                    break;
+                case "ProcessesTotalCpuTime":
+                    var processesTotalCpuTime = ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(PageSize, _pageNo,
+                        _totalCpuTimeSb.Value);
+                    _processesList = processesTotalCpuTime.ProcessesList;
+                    _numberOfPages = processesTotalCpuTime.NumberOfPages;
                     break;
                 default:
                     var processesDefault = ProcessWatchApplication.AllProcesses(PageSize, _pageNo);
