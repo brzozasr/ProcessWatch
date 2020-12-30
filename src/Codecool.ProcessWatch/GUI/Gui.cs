@@ -86,6 +86,8 @@ namespace Codecool.ProcessWatch.GUI
             view.AppendColumn("Threads", rightAlignment, "text", 7);
             view.AppendColumn("Start Time", centerAlignment, "text", 8);
             view.AppendColumn("Base Priority", rightAlignment, "text", 9);
+
+            view.Selection.SelectFunction += GetSelectFunction;
             // view.Show();
 
             scrolled.Add(view);
@@ -94,6 +96,7 @@ namespace Codecool.ProcessWatch.GUI
             HBox topHBox = new HBox(false, 20);
             VBox topLeftVBox = new VBox(false, 0);
             _topRightHBox = new HBox(false, 0);
+            HBox barKillHBox = new HBox(false, 20);
             HBox naviBtnHBox = new HBox(false, 10);
 
             Label filterLbl = new Label("Filter by:");
@@ -109,14 +112,18 @@ namespace Codecool.ProcessWatch.GUI
 
             topLeftVBox.Add(topLeftFixed);
 
-            // _searchEntry = new Entry();
-            // topRightHBox.Add(_searchEntry);
-
             Alignment topRightAlignment = new Alignment(0, 0.7f, 0, 0);
             topRightAlignment.Add(_topRightHBox);
 
             topHBox.PackStart(topLeftVBox, false, false, 0);
             topHBox.PackEnd(topRightAlignment, true, true, 0);
+
+            Button killBtn = new Button("Kill selected");
+            
+            barKillHBox.Add(killBtn);
+
+            Alignment killBtnAlignment = new Alignment(0.99f, 0, 0, 0);
+            killBtnAlignment.Add(barKillHBox);
 
             _previousBtn = new Button("<<");
             _pageNoLbl = new Label($"{_pageNo} of {_numberOfPages}");
@@ -150,6 +157,7 @@ namespace Codecool.ProcessWatch.GUI
 
             mainVBox.PackStart(topHBox, true, true, 0);
             mainVBox.PackStart(scrolled, true, true, 0);
+            mainVBox.PackStart(killBtnAlignment, false, false, 10);
             mainVBox.PackEnd(naviBtnAlignment, true, true, 20);
 
             Add(mainVBox);
@@ -160,6 +168,19 @@ namespace Codecool.ProcessWatch.GUI
             // {
             //     Gtk.Application.RunIteration();
             // }
+        }
+
+        private bool GetSelectFunction(TreeSelection selection, ITreeModel model, TreePath path, bool pathCurrentlySelected)
+        {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            TreeIter iter;
+            
+            if (selection.GetSelected (out model, out iter)) {
+                Console.WriteLine("Path of selected row = {0}", model.GetPath (iter));
+                Console.WriteLine(model.GetValue (iter, 0));
+            }
+            
+            return true;
         }
 
         private void CreateHidenWidgets()
