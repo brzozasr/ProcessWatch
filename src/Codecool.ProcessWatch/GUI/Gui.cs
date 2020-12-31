@@ -38,6 +38,9 @@ namespace Codecool.ProcessWatch.GUI
         private Label _userCpuTimeLbl;
         private SpinButton _totalCpuTimeSb;
         private Label _totalCpuTimeLbl;
+        private Label _noProcessesToKillLbl;
+        private Button _killBtn;
+        private SortedList<int, string> _processesToKillList = new SortedList<int, string>();
 
         public Gui() : base("Process Watch - GUI")
         {
@@ -75,7 +78,7 @@ namespace Codecool.ProcessWatch.GUI
             leftAlignment.SetAlignment(0.0f, 0.0f);
 
             NodeView view = new NodeView(GetNodeStoreStore());
-            view.Selection.Mode = SelectionMode.Multiple;
+            // view.Selection.Mode = SelectionMode.Multiple;
             view.AppendColumn("PID", rightAlignment, "text", 0);
             view.AppendColumn("Name", leftAlignment, "text", 1);
             view.AppendColumn("Memory Usage", rightAlignment, "text", 2);
@@ -86,8 +89,8 @@ namespace Codecool.ProcessWatch.GUI
             view.AppendColumn("Threads", rightAlignment, "text", 7);
             view.AppendColumn("Start Time", centerAlignment, "text", 8);
             view.AppendColumn("Base Priority", rightAlignment, "text", 9);
-
-            view.Selection.SelectFunction += GetSelectFunction;
+            
+            view.RowActivated += GetRowsActive;
             // view.Show();
 
             scrolled.Add(view);
@@ -118,9 +121,12 @@ namespace Codecool.ProcessWatch.GUI
             topHBox.PackStart(topLeftVBox, false, false, 0);
             topHBox.PackEnd(topRightAlignment, true, true, 0);
 
-            Button killBtn = new Button("Kill selected");
+            _noProcessesToKillLbl = new Label("Number processes to kill: 0   ");
+            _killBtn = new Button("Kill selected");
+            _killBtn.Sensitive = false;
             
-            barKillHBox.Add(killBtn);
+            barKillHBox.Add(_noProcessesToKillLbl);
+            barKillHBox.Add(_killBtn);
 
             Alignment killBtnAlignment = new Alignment(0.99f, 0, 0, 0);
             killBtnAlignment.Add(barKillHBox);
@@ -170,17 +176,31 @@ namespace Codecool.ProcessWatch.GUI
             // }
         }
 
-        private bool GetSelectFunction(TreeSelection selection, ITreeModel model, TreePath path, bool pathCurrentlySelected)
+        private void GetRowsActive(object o, RowActivatedArgs args)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
-            TreeIter iter;
-            
-            if (selection.GetSelected (out model, out iter)) {
-                Console.WriteLine("Path of selected row = {0}", model.GetPath (iter));
-                Console.WriteLine(model.GetValue (iter, 0));
+            TreeIter iter;        
+            NodeView view = (NodeView) o;
+
+            if (view.Model.GetIter(out iter, args.Path)) {
+                string row = (string) view.Model.GetValue(iter,  0 );
+                row += ", " + (string) view.Model.GetValue(iter,  1 );
+                Console.WriteLine(row);
+
+                string processId = (string) view.Model.GetValue(iter, 0);
+                string processName = (string) view.Model.GetValue(iter, 1);
+
+                try
+                {
+                    _processesToKillList.Add(Int32.Parse(processId.Trim()), processName);
+
+                    _noProcessesToKillLbl.Text = $"Number processes to kill: {_processesToKillList.Count}   ";
+                }
+                catch (Exception e)
+                {
+                    DialogWindow("PROCESSES TO KILL" ,e.Message);
+                }
+                
             }
-            
-            return true;
         }
 
         private void CreateHidenWidgets()
@@ -904,11 +924,13 @@ namespace Codecool.ProcessWatch.GUI
             }
         }
 
-        private void DialogWindow(string message)
+        private void DialogWindow(string title, string message)
         {
             MessageDialog md = new MessageDialog(this,
-                DialogFlags.DestroyWithParent, MessageType.Info,
-                ButtonsType.Close, message);
+                DialogFlags.Modal, MessageType.Info,
+                ButtonsType.Ok, message);
+            md.Title = title;
+            md.Icon = Image.LoadFromResource("Gtktester.Icons.PNG.256.png").Pixbuf;
             md.Run();
             md.Dispose();
         }
