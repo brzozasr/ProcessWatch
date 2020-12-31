@@ -100,11 +100,29 @@ namespace Codecool.ProcessWatch.GUI
             scrolled.Add(view);
 
             VBox mainVBox = new VBox(false, 0);
+            HBox topMenuHBox = new HBox(false, 3);
             HBox topHBox = new HBox(false, 20);
             VBox topLeftVBox = new VBox(false, 0);
             _topRightHBox = new HBox(false, 0);
             HBox barKillHBox = new HBox(false, 5);
             HBox naviBtnHBox = new HBox(false, 10);
+            
+            Alignment topMenuAlignment = new Alignment(0.01f, 0, 0, 0);
+            topMenuAlignment.Add(topMenuHBox);
+
+            Image refreshImage = new Image(Stock.Refresh, IconSize.Button);
+            Button refreshBtn = new Button(refreshImage);
+            refreshBtn.TooltipText = "Refresh view";
+            Image helpImage = new Image(Stock.Help, IconSize.Button);
+            Button helpBtn = new Button(helpImage);
+            helpBtn.TooltipText = "Help";
+            Image aboutImage = new Image(Stock.About, IconSize.Button);
+            Button aboutBtn = new Button(aboutImage);
+            aboutBtn.TooltipText = "About app";
+            
+            topMenuHBox.Add(refreshBtn);
+            topMenuHBox.Add(helpBtn);
+            topMenuHBox.Add(aboutBtn);
 
             Label filterLbl = new Label("Filter by:");
             _filterCb = new ComboBox(_cbStore);
@@ -178,6 +196,7 @@ namespace Codecool.ProcessWatch.GUI
             Alignment naviBtnAlignment = new Alignment(0.5f, 0, 0, 0);
             naviBtnAlignment.Add(naviBtnHBox);
 
+            mainVBox.PackStart(topMenuAlignment, false, false, 10);
             mainVBox.PackStart(topHBox, true, true, 0);
             mainVBox.PackStart(scrolled, true, true, 0);
             mainVBox.PackStart(killBtnAlignment, false, false, 10);
@@ -258,8 +277,11 @@ namespace Codecool.ProcessWatch.GUI
                     sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
                 }
 
-                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
                 ClearProcessesToKillList();
+                // ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                OnChangeCommonMethod();
+                
+                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
             }
             else
             {
