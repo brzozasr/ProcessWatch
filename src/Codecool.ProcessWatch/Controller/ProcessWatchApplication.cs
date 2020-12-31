@@ -11,6 +11,7 @@ namespace Codecool.ProcessWatch.Controller
     public static class ProcessWatchApplication
     {
         public static List<MemoryItemProcess> TmpList { get; private set; }
+        public static int TmpNumberOfPages { get; private set; }
         private static List<MemoryItemProcess> _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
         
         public static void RefreshAllMemoryItemProcesses()
@@ -290,18 +291,20 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedList);
         }
 
-        public static void KillProcess(int id)
+        public static string KillProcess(int id)
         {
             try
             {
                 Process.GetProcessById(id).Kill();
                 RefreshAllMemoryItemProcesses();
                 Console.WriteLine($"Process with an Id of {id} was killed.");
+                return $"Process with an Id of {id} was killed.";
             }
             catch (Exception e)
             {
                 RefreshAllMemoryItemProcesses();
                 Console.WriteLine(e.Message);
+                return e.Message;
             }
         }
         
@@ -341,12 +344,14 @@ namespace Codecool.ProcessWatch.Controller
                 //     Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 
                 TmpList = new List<MemoryItemProcess>(processesPage);
+                TmpNumberOfPages = (int) numberOfPages;
 
                 return ((int) numberOfPages, processesPage);
             }
 
             var emptyList = new List<MemoryItemProcess>();
             TmpList = new List<MemoryItemProcess>(emptyList);
+            TmpNumberOfPages = 0;
             
             return (0, emptyList);
         }

@@ -1,14 +1,16 @@
+using System;
 using Gtk;
 
 namespace Codecool.ProcessWatch.GUI
 {
     public class StartGui
     {
+        public Window MainWindow;
         public StartGui()
         {
             Application.Init();
-            Gui mainWindow = new Gui();
-            mainWindow.Show();
+            MainWindow = new Gui();
+            MainWindow.ShowAll();
             Application.Run();
         }
     }

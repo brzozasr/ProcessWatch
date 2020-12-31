@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
+using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.Model;
+using Gtk;
 
 namespace Codecool.ProcessWatch
 {
@@ -12,29 +14,23 @@ namespace Codecool.ProcessWatch
         {
             while (true)
             {
-                Console.WriteLine("Write number:");
+                Console.WriteLine("Write number of page:");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
                     Console.Clear();
-                    Menu(number);
-                }
-                
-                Console.WriteLine("Write process ID:");
-                string inputId = Console.ReadLine();
-                if (Int32.TryParse(inputId, out var processId))
-                {
-                    Console.Clear();
-                    ProcessWatchApplication.KillProcess(processId);
+                    GetMenu(number);
+
+                    StartGui win = new StartGui();
                 }
             }
         }
 
-        private static void Menu(int pageNo)
+        private static void GetMenu(int pageNo)
         {
-            int pageSize = 20;
+            int pageSize = 25;
 
-            var pagination = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, "chro");
+            var pagination = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
 
             StringBuilder sb = new StringBuilder();
 
