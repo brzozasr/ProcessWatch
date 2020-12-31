@@ -298,7 +298,7 @@ namespace Codecool.ProcessWatch.Controller
                 Process.GetProcessById(id).Kill();
                 RefreshAllMemoryItemProcesses();
                 Console.WriteLine($"Process with an Id of {id} was killed.");
-                return $"Process with an Id of {id} was killed.\n";
+                return $"Process with an Id of {id} was killed.";
             }
             catch (Exception e)
             {
