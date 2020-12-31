@@ -291,18 +291,20 @@ namespace Codecool.ProcessWatch.Controller
             return ProcessesPagination(pageSize, pageNo, searchedList);
         }
 
-        public static void KillProcess(int id)
+        public static string KillProcess(int id)
         {
             try
             {
                 Process.GetProcessById(id).Kill();
                 RefreshAllMemoryItemProcesses();
                 Console.WriteLine($"Process with an Id of {id} was killed.");
+                return $"Process with an Id of {id} was killed.\n";
             }
             catch (Exception e)
             {
                 RefreshAllMemoryItemProcesses();
                 Console.WriteLine(e.Message);
+                return e.Message;
             }
         }
         

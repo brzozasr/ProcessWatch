@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.Model;
 using Gtk;
@@ -40,6 +42,8 @@ namespace Codecool.ProcessWatch.GUI
         private Label _totalCpuTimeLbl;
         private Label _noProcessesToKillLbl;
         private Button _killBtn;
+        private Button _infoKillBtn;
+        private Button _clearKillListBtn;
         private SortedList<int, string> _processesToKillList = new SortedList<int, string>();
 
         public Gui() : base("Process Watch - GUI")
@@ -99,7 +103,7 @@ namespace Codecool.ProcessWatch.GUI
             HBox topHBox = new HBox(false, 20);
             VBox topLeftVBox = new VBox(false, 0);
             _topRightHBox = new HBox(false, 0);
-            HBox barKillHBox = new HBox(false, 20);
+            HBox barKillHBox = new HBox(false, 5);
             HBox naviBtnHBox = new HBox(false, 10);
 
             Label filterLbl = new Label("Filter by:");
@@ -122,10 +126,23 @@ namespace Codecool.ProcessWatch.GUI
             topHBox.PackEnd(topRightAlignment, true, true, 0);
 
             _noProcessesToKillLbl = new Label("Number processes to kill: 0   ");
+            Image iconInfo = new Image(Stock.Find, IconSize.Button);
+            _infoKillBtn = new Button(iconInfo);
+            _infoKillBtn.TooltipText = "Show processes to kill";
+            _infoKillBtn.Sensitive = false;
+            Image iconClear = new Image(Stock.Clear, IconSize.Button);
+            _clearKillListBtn = new Button(iconClear);
+            _clearKillListBtn.TooltipText = "Clear processes to kill";
+            _clearKillListBtn.Sensitive = false;
             _killBtn = new Button("Kill selected");
             _killBtn.Sensitive = false;
+            _clearKillListBtn.Clicked += OnClickClearKillListBtn;
+            _infoKillBtn.Clicked += OnClickInfoKillBtn;
+            _killBtn.Clicked += OnClickKillBtn;
             
             barKillHBox.Add(_noProcessesToKillLbl);
+            barKillHBox.Add(_infoKillBtn);
+            barKillHBox.Add(_clearKillListBtn);
             barKillHBox.Add(_killBtn);
 
             Alignment killBtnAlignment = new Alignment(0.99f, 0, 0, 0);
@@ -182,25 +199,81 @@ namespace Codecool.ProcessWatch.GUI
             NodeView view = (NodeView) o;
 
             if (view.Model.GetIter(out iter, args.Path)) {
-                string row = (string) view.Model.GetValue(iter,  0 );
-                row += ", " + (string) view.Model.GetValue(iter,  1 );
-                Console.WriteLine(row);
-
                 string processId = (string) view.Model.GetValue(iter, 0);
                 string processName = (string) view.Model.GetValue(iter, 1);
 
                 try
                 {
                     _processesToKillList.Add(Int32.Parse(processId.Trim()), processName);
-
                     _noProcessesToKillLbl.Text = $"Number processes to kill: {_processesToKillList.Count}   ";
+                    if (_processesToKillList.Count > 0)
+                    {
+                        _killBtn.Sensitive = true;
+                        _infoKillBtn.Sensitive = true;
+                        _clearKillListBtn.Sensitive = true;
+                    }
                 }
                 catch (Exception e)
                 {
-                    DialogWindow("PROCESSES TO KILL" ,e.Message);
+                    DialogWindow("PROCESSES TO KILL - ERROR" ,e.Message, ButtonsType.Ok);
                 }
                 
             }
+        }
+        
+        private void OnClickClearKillListBtn(object sender, EventArgs e)
+        {
+            ClearProcessesToKillList();
+        }
+        
+        private void OnClickInfoKillBtn(object sender, EventArgs e)
+        {
+            if (_processesToKillList.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                char[] charsToTrim = { ' ', '\n', '\t'};
+                foreach (var keyValuePair in _processesToKillList)
+                {
+                    sb.Append($"{keyValuePair.Key, -10}   {keyValuePair.Value.Trim(charsToTrim), 18}\n");
+                }
+                
+                DialogWindow("PROCESSES TO KILL", sb.ToString(), ButtonsType.Close);
+            }
+            else
+            {
+                DialogWindow("CLEAR LIST ERROR", "Something went wrong!", ButtonsType.Close);
+            }
+        }
+        
+        private void OnClickKillBtn(object sender, EventArgs e)
+        {
+            if (_processesToKillList.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                char[] charsToTrim = { ' ', '\n', '\t'};
+                
+                foreach (var keyValuePair in _processesToKillList)
+                {
+                    string infoMessage = ProcessWatchApplication.KillProcess(keyValuePair.Key);
+                    sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
+                }
+
+                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
+                ClearProcessesToKillList();
+            }
+            else
+            {
+                DialogWindow("KILL PROCESSES - ERROR", "Something went wrong!", ButtonsType.Close);
+            }
+        }
+
+        private void ClearProcessesToKillList()
+        {
+            _processesToKillList.Clear();
+            _noProcessesToKillLbl.Text = $"Number processes to kill: {_processesToKillList.Count}   ";
+            _killBtn.Sensitive = false;
+            _infoKillBtn.Sensitive = false;
+            _clearKillListBtn.Sensitive = false;
         }
 
         private void CreateHidenWidgets()
@@ -348,6 +421,7 @@ namespace Codecool.ProcessWatch.GUI
                     HideAllWidgets();
                     _pageNo = 1;
                     InitAllProcesses();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes name":
                     _filterType = "ProcessesByName";
@@ -355,6 +429,7 @@ namespace Codecool.ProcessWatch.GUI
                     _searchEntry.Visible = true;
                     _pageNo = 1;
                     InitProcessesByName();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes started at date":
                     _filterType = "ProcessesStartAtDate";
@@ -364,6 +439,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startAtDateYearSb.Visible = true;
                     _pageNo = 1;
                     InitProcessesAtDate();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes started at day":
                     _filterType = "ProcessesStartAtDay";
@@ -371,6 +447,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startAtDaySb.Visible = true;
                     _pageNo = 1;
                     InitProcessesAtDay();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes started at month":
                     _filterType = "ProcessesStartAtMonth";
@@ -378,6 +455,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     _startAtMonthSb.Visible = true;
                     InitProcessesAtMonth();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes started before date":
                     _filterType = "ProcessesStarBeforeDate";
@@ -387,6 +465,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startBeforeDateMonthSb.Visible = true;
                     _startBeforeDateYearSb.Visible = true;
                     InitProcessesBeforeDate();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes started after date":
                     _filterType = "ProcessesStarAfterDate";
@@ -396,6 +475,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startAfterDateMonthSb.Visible = true;
                     _startAfterDateYearSb.Visible = true;
                     InitProcessesAfterDate();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes physical memory usage greater than...":
                     _filterType = "ProcessesPhysicalMemoryUsage";
@@ -404,6 +484,7 @@ namespace Codecool.ProcessWatch.GUI
                     _memoryUsageSb.Visible = true;
                     _memoryUsageLbl.Visible = true;
                     InitPhysicalMemoryUsage();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes user CPU time greater than...":
                     _filterType = "ProcessesUserCpuTime";
@@ -412,6 +493,7 @@ namespace Codecool.ProcessWatch.GUI
                     _userCpuTimeSb.Visible = true;
                     _userCpuTimeLbl.Visible = true;
                     InitUserCpuTime();
+                    ClearProcessesToKillList();
                     break;
                 case "- processes total CPU time greater than...":
                     _filterType = "ProcessesTotalCpuTime";
@@ -420,9 +502,14 @@ namespace Codecool.ProcessWatch.GUI
                     _totalCpuTimeSb.Visible = true;
                     _totalCpuTimeLbl.Visible = true;
                     InitTotalCpuTime();
+                    ClearProcessesToKillList();
                     break;
                 default:
+                    _filterType = "AllProcesses";
                     HideAllWidgets();
+                    _pageNo = 1;
+                    InitAllProcesses();
+                    ClearProcessesToKillList();
                     break;
             }
         }
@@ -924,13 +1011,12 @@ namespace Codecool.ProcessWatch.GUI
             }
         }
 
-        private void DialogWindow(string title, string message)
+        private void DialogWindow(string title, string message, ButtonsType buttonsType)
         {
             MessageDialog md = new MessageDialog(this,
                 DialogFlags.Modal, MessageType.Info,
-                ButtonsType.Ok, message);
+                buttonsType, message);
             md.Title = title;
-            md.Icon = Image.LoadFromResource("Gtktester.Icons.PNG.256.png").Pixbuf;
             md.Run();
             md.Dispose();
         }
