@@ -16,4 +16,8 @@
     <PackageReference Include="GtkSharp" Version="3.22.25.128" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="info-64.png" />
+  </ItemGroup>
+
 </Project>
