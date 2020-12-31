@@ -44,6 +44,7 @@ namespace Codecool.ProcessWatch.GUI
         private Button _killBtn;
         private Button _infoKillBtn;
         private Button _clearKillListBtn;
+        private Button _refreshBtn;
         private SortedList<int, string> _processesToKillList = new SortedList<int, string>();
 
         public Gui() : base("Process Watch - GUI")
@@ -64,7 +65,7 @@ namespace Codecool.ProcessWatch.GUI
 
             SetPosition(WindowPosition.Center);
             SetSizeRequest(960, 550);
-            this.TypeHint = Gdk.WindowTypeHint.Desktop;
+            this.TypeHint = Gdk.WindowTypeHint.Normal;
             this.Resizable = false;
 
             DeleteEvent += AppQuit;
@@ -111,16 +112,19 @@ namespace Codecool.ProcessWatch.GUI
             topMenuAlignment.Add(topMenuHBox);
 
             Image refreshImage = new Image(Stock.Refresh, IconSize.Button);
-            Button refreshBtn = new Button(refreshImage);
-            refreshBtn.TooltipText = "Refresh view";
+            _refreshBtn = new Button(refreshImage);
+            _refreshBtn.TooltipText = "Refresh view";
             Image helpImage = new Image(Stock.Help, IconSize.Button);
             Button helpBtn = new Button(helpImage);
             helpBtn.TooltipText = "Help";
             Image aboutImage = new Image(Stock.About, IconSize.Button);
             Button aboutBtn = new Button(aboutImage);
             aboutBtn.TooltipText = "About app";
+            _refreshBtn.Clicked += OnClickRefreshBtn;
+            aboutBtn.Clicked += OnClickAboutBtn;
             
-            topMenuHBox.Add(refreshBtn);
+            
+            topMenuHBox.Add(_refreshBtn);
             topMenuHBox.Add(helpBtn);
             topMenuHBox.Add(aboutBtn);
 
@@ -240,6 +244,19 @@ namespace Codecool.ProcessWatch.GUI
             }
         }
         
+        private void OnClickRefreshBtn(object sender, EventArgs e)
+        {
+            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+            RemoveAllDataView();
+            RefreshView();
+            SetNaviBtnSensitive();
+        }
+        
+        private void OnClickAboutBtn(object sender, EventArgs e)
+        {
+           _ = new AboutApp(this);
+        }
+        
         private void OnClickClearKillListBtn(object sender, EventArgs e)
         {
             ClearProcessesToKillList();
@@ -277,8 +294,8 @@ namespace Codecool.ProcessWatch.GUI
                     sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
                 }
 
+                ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                 ClearProcessesToKillList();
-                // ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                 OnChangeCommonMethod();
                 
                 DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
