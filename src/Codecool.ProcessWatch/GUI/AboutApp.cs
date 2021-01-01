@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Codecool.ProcessWatch.Controller;
 using Gdk;
 using Gtk;
@@ -12,7 +14,7 @@ namespace Codecool.ProcessWatch.GUI
         {
             WindowPosition = WindowPosition.CenterOnParent;
             TransientFor = parent;
-            SetSizeRequest(480, 360);
+            SetSizeRequest(480, 380);
             this.TypeHint = Gdk.WindowTypeHint.Dialog;
             this.Resizable = false;
 
@@ -22,6 +24,7 @@ namespace Codecool.ProcessWatch.GUI
             HBox nameAppHBox = new HBox(false, 10);
             HBox verAppHBox = new HBox(false, 10);
             HBox authorAppHBox = new HBox(false, 10);
+            HBox webPageHBox = new HBox(false, 10);
             HBox licenseHBox = new HBox(false, 10);
             HBox closeHBox = new HBox(false, 10);
 
@@ -30,7 +33,9 @@ namespace Codecool.ProcessWatch.GUI
                 @".nameAppLbl { color: #008000; font-size: 20px; font-weight: bold; padding: 10px;}
                 .verAppLbl { color: #0066cc; font-size: 16px; padding: 10px;}
                 .authorAppLbl { color: #990000; font-size: 14px; font-weight: bold; padding: 10px 1px 10px 10px;}
-                .authorsNameAppLbl { color: #cc0000; font-size: 14px; padding: 10px 10px 10px 1px;}");
+                .authorsNameAppLbl { color: #cc0000; font-size: 14px; padding: 10px 10px 10px 1px;}
+                .webPageAppLbl { color: #0066cc; font-size: 14px; padding: 10px 0 10px 10px;}
+                .webPageLinkAppLbl { color: #004d99; font-size: 14px; padding: 10px 10px 10px 0;}");
             Gtk.StyleContext.AddProviderForScreen(Gdk.Screen.Default, cssProvider, 900);
 
             Alignment nameAppAlignment = new Alignment(0.5f, 0, 0, 0);
@@ -42,11 +47,20 @@ namespace Codecool.ProcessWatch.GUI
             verAppLbl.StyleContext.AddClass("verAppLbl");
 
             Alignment authorAppAlignment = new Alignment(0.5f, 0.01f, 0, 0);
-            Label authorAppLbl = new Label("Authors: ");
+            Label authorAppLbl = new Label("Authors:");
             authorAppLbl.StyleContext.AddClass("authorAppLbl");
             Label authorsNameAppLbl = new Label(@"Sławomir Brzozowski,
 Michał Orłowski");
             authorsNameAppLbl.StyleContext.AddClass("authorsNameAppLbl");
+
+            Alignment webPageAppAlignment = new Alignment(0.5f, 0.01f, 0, 0);
+            Label webPageAppLbl = new Label("Web page:");
+            webPageAppLbl.StyleContext.AddClass("webPageAppLbl");
+            Label webPageLinkAppLbl = new Label("https://github.com/brzozasr/ProcessWatch");
+            webPageLinkAppLbl.StyleContext.AddClass("webPageLinkAppLbl");
+            EventBox link = new EventBox();
+            link.Add(webPageLinkAppLbl);
+            link.ButtonPressEvent += OnClickLink;
 
 
             TextView licenseTxtView = new TextView();
@@ -55,11 +69,11 @@ Michał Orłowski");
             ScrolledWindow scrolledWindow = new ScrolledWindow();
             scrolledWindow.HeightRequest = 180;
             scrolledWindow.Add(licenseTxtView);
-            
+
             Alignment closeAppAlignment = new Alignment(0.5f, 0, 0, 0);
             Button closeAppBtn = new Button("Close");
             closeAppBtn.Clicked += OnClickCloseAbout;
-            
+
 
             nameAppHBox.Add(nameAppLbl);
             nameAppAlignment.Add(nameAppHBox);
@@ -71,19 +85,57 @@ Michał Orłowski");
             authorAppHBox.Add(authorsNameAppLbl);
             authorAppAlignment.Add(authorAppHBox);
 
+            webPageHBox.Add(webPageAppLbl);
+            webPageHBox.Add(link);
+            webPageAppAlignment.Add(webPageHBox);
+
             licenseHBox.Add(scrolledWindow);
-            
+
             closeHBox.Add(closeAppBtn);
             closeAppAlignment.Add(closeHBox);
 
             mainVBox.PackStart(nameAppAlignment, false, false, 0);
             mainVBox.PackStart(verAppAlignment, false, false, 0);
             mainVBox.PackStart(authorAppAlignment, false, false, 0);
+            mainVBox.PackStart(webPageAppAlignment, false, false, 0);
             mainVBox.PackStart(licenseHBox, false, false, 0);
             mainVBox.PackEnd(closeAppAlignment, false, false, 10);
 
             Add(mainVBox);
             ShowAll();
+        }
+
+        private void OnClickLink(object o, ButtonPressEventArgs args)
+        {
+            EventBox box = (EventBox) o;
+
+            if (args.Event.Button.Equals(1))
+            {
+                Label link = (Label) box.Child;
+                string url = link.Text;
+
+                try
+                {
+                    Process.Start(url);
+                }
+                catch (Exception)
+                {
+                    // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        url = url.Replace("&", "^&");
+                        Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") {CreateNoWindow = true});
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        Process.Start("xdg-open", url);
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    {
+                        Process.Start("open", url);
+                    }
+                }
+            }
         }
 
         private void OnClickCloseAbout(object sender, EventArgs e)

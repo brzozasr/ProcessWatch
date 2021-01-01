@@ -122,6 +122,7 @@ namespace Codecool.ProcessWatch.GUI
             aboutBtn.TooltipText = "About app";
             _refreshBtn.Clicked += OnClickRefreshBtn;
             aboutBtn.Clicked += OnClickAboutBtn;
+            helpBtn.Clicked += OnClickHelpBtn;
             
             
             topMenuHBox.Add(_refreshBtn);
@@ -250,6 +251,11 @@ namespace Codecool.ProcessWatch.GUI
             RemoveAllDataView();
             RefreshView();
             SetNaviBtnSensitive();
+        }
+        
+        private void OnClickHelpBtn(object sender, EventArgs e)
+        {
+            _ = new HelpApp(this);
         }
         
         private void OnClickAboutBtn(object sender, EventArgs e)
