@@ -1,22 +1,94 @@
 using System;
 using Codecool.ProcessWatch.Controller;
+using Gdk;
 using Gtk;
+using Window = Gtk.Window;
 
 namespace Codecool.ProcessWatch.GUI
 {
     public class AboutApp : Window
     {
-        public AboutApp(Window parent) : base ("About Process Watch")
+        public AboutApp(Window parent) : base("About Process Watch")
         {
             WindowPosition = WindowPosition.CenterOnParent;
             TransientFor = parent;
-            SetSizeRequest(400, 300);
+            SetSizeRequest(480, 360);
             this.TypeHint = Gdk.WindowTypeHint.Dialog;
             this.Resizable = false;
+
+            DeleteEvent += OnDelete;
+
+            VBox mainVBox = new VBox(false, 0);
+            HBox nameAppHBox = new HBox(false, 10);
+            HBox verAppHBox = new HBox(false, 10);
+            HBox authorAppHBox = new HBox(false, 10);
+            HBox licenseHBox = new HBox(false, 10);
+            HBox closeHBox = new HBox(false, 10);
+
+            CssProvider cssProvider = new CssProvider();
+            cssProvider.LoadFromData(
+                @".nameAppLbl { color: #008000; font-size: 20px; font-weight: bold; padding: 10px;}
+                .verAppLbl { color: #0066cc; font-size: 16px; padding: 10px;}
+                .authorAppLbl { color: #990000; font-size: 14px; font-weight: bold; padding: 10px 1px 10px 10px;}
+                .authorsNameAppLbl { color: #cc0000; font-size: 14px; padding: 10px 10px 10px 1px;}");
+            Gtk.StyleContext.AddProviderForScreen(Gdk.Screen.Default, cssProvider, 900);
+
+            Alignment nameAppAlignment = new Alignment(0.5f, 0, 0, 0);
+            Label nameAppLbl = new Label("Process Watch");
+            nameAppLbl.StyleContext.AddClass("nameAppLbl");
+
+            Alignment verAppAlignment = new Alignment(0.5f, 0, 0, 0);
+            Label verAppLbl = new Label("Version: 1.0");
+            verAppLbl.StyleContext.AddClass("verAppLbl");
+
+            Alignment authorAppAlignment = new Alignment(0.5f, 0.01f, 0, 0);
+            Label authorAppLbl = new Label("Authors: ");
+            authorAppLbl.StyleContext.AddClass("authorAppLbl");
+            Label authorsNameAppLbl = new Label(@"Sławomir Brzozowski,
+Michał Orłowski");
+            authorsNameAppLbl.StyleContext.AddClass("authorsNameAppLbl");
+
+
+            TextView licenseTxtView = new TextView();
+            licenseTxtView.Buffer.Text = License();
+            licenseTxtView.Editable = false;
+            ScrolledWindow scrolledWindow = new ScrolledWindow();
+            scrolledWindow.HeightRequest = 180;
+            scrolledWindow.Add(licenseTxtView);
             
-            DeleteEvent += OnDelete; 
+            Alignment closeAppAlignment = new Alignment(0.5f, 0, 0, 0);
+            Button closeAppBtn = new Button("Close");
+            closeAppBtn.Clicked += OnClickCloseAbout;
             
+
+            nameAppHBox.Add(nameAppLbl);
+            nameAppAlignment.Add(nameAppHBox);
+
+            verAppHBox.Add(verAppLbl);
+            verAppAlignment.Add(verAppHBox);
+
+            authorAppHBox.Add(authorAppLbl);
+            authorAppHBox.Add(authorsNameAppLbl);
+            authorAppAlignment.Add(authorAppHBox);
+
+            licenseHBox.Add(scrolledWindow);
+            
+            closeHBox.Add(closeAppBtn);
+            closeAppAlignment.Add(closeHBox);
+
+            mainVBox.PackStart(nameAppAlignment, false, false, 0);
+            mainVBox.PackStart(verAppAlignment, false, false, 0);
+            mainVBox.PackStart(authorAppAlignment, false, false, 0);
+            mainVBox.PackStart(licenseHBox, false, false, 0);
+            mainVBox.PackEnd(closeAppAlignment, false, false, 10);
+
+            Add(mainVBox);
             ShowAll();
+        }
+
+        private void OnClickCloseAbout(object sender, EventArgs e)
+        {
+            this.Dispose();
         }
 
         private void OnDelete(object o, DeleteEventArgs args)
@@ -24,12 +96,12 @@ namespace Codecool.ProcessWatch.GUI
             this.Dispose();
         }
 
-        private static string Licence()
+        private static string License()
         {
             return @"
-                                    Apache License
-                                Version 2.0, January 2004
-                            http://www.apache.org/licenses/
+                                            Apache License
+                                        Version 2.0, January 2004
+                                      http://www.apache.org/licenses/
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
