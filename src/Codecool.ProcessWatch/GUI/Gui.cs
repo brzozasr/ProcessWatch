@@ -257,6 +257,7 @@ namespace Codecool.ProcessWatch.GUI
                 _liveViewUpdateBW.RunWorkerAsync();
                 _liveBtn.Child.Dispose();
                 _liveBtn.Image = new Image(Stock.Stop, IconSize.Button);
+                _liveBtn.TooltipText = "Stop auto refresh view";
                 _view.Selection.Mode = SelectionMode.None;
                 ClearProcessesToKillList();
             }
@@ -266,6 +267,7 @@ namespace Codecool.ProcessWatch.GUI
                 _liveViewUpdateBW.CancelAsync();
                 _liveBtn.Child.Dispose();
                 _liveBtn.Image = new Image(Stock.Execute, IconSize.Button);
+                _liveBtn.TooltipText = "Run auto refresh view";
                 _view.Selection.Mode = SelectionMode.Single;
             }
         }
@@ -278,6 +280,7 @@ namespace Codecool.ProcessWatch.GUI
                 _liveViewUpdateBW.CancelAsync();
                 _liveBtn.Child.Dispose();
                 _liveBtn.Image = new Image(Stock.Execute, IconSize.Button);
+                _liveBtn.TooltipText = "Run auto refresh view";
                 _view.Selection.Mode = SelectionMode.Single;
             }
         }
