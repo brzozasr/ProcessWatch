@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.Model;
 using Gtk;
@@ -11,6 +13,7 @@ namespace Codecool.ProcessWatch.GUI
     public class Gui : Window
     {
         private NodeStore _store;
+        private NodeView _view;
         private const int PageSize = 25;
         private List<MemoryItemProcess> _processesList = new List<MemoryItemProcess>();
         private int _numberOfPages;
@@ -44,7 +47,11 @@ namespace Codecool.ProcessWatch.GUI
         private Button _killBtn;
         private Button _infoKillBtn;
         private Button _clearKillListBtn;
+        private Button _refreshBtn;
+        private Button _liveBtn;
         private SortedList<int, string> _processesToKillList = new SortedList<int, string>();
+        private BackgroundWorker _liveViewUpdateBW;
+        private bool _isLiveViewUpdateRun = false;
 
         public Gui() : base("Process Watch - GUI")
         {
@@ -62,9 +69,12 @@ namespace Codecool.ProcessWatch.GUI
                 "- processes total CPU time greater than..."
             };
 
+            _liveViewUpdateBW = new BackgroundWorker();
+            _liveViewUpdateBW.DoWork += DoWorkLiveViewUpdate;
+
             SetPosition(WindowPosition.Center);
             SetSizeRequest(960, 550);
-            this.TypeHint = Gdk.WindowTypeHint.Desktop;
+            this.TypeHint = Gdk.WindowTypeHint.Normal;
             this.Resizable = false;
 
             DeleteEvent += AppQuit;
@@ -81,30 +91,57 @@ namespace Codecool.ProcessWatch.GUI
             CellRendererText leftAlignment = new CellRendererText();
             leftAlignment.SetAlignment(0.0f, 0.0f);
 
-            NodeView view = new NodeView(GetNodeStoreStore());
-            // view.Selection.Mode = SelectionMode.Multiple;
-            view.AppendColumn("PID", rightAlignment, "text", 0);
-            view.AppendColumn("Name", leftAlignment, "text", 1);
-            view.AppendColumn("Memory Usage", rightAlignment, "text", 2);
-            view.AppendColumn("Priority", leftAlignment, "text", 3);
-            view.AppendColumn("User CPU Time", rightAlignment, "text", 4);
-            view.AppendColumn("Privileged CPU Time", rightAlignment, "text", 5);
-            view.AppendColumn("Total CPU Time", rightAlignment, "text", 6);
-            view.AppendColumn("Threads", rightAlignment, "text", 7);
-            view.AppendColumn("Start Time", centerAlignment, "text", 8);
-            view.AppendColumn("Base Priority", rightAlignment, "text", 9);
-            
-            view.RowActivated += GetRowsActive;
+            _view = new NodeView(GetNodeStoreStore());
+            // _view.Selection.Mode = SelectionMode.Multiple;
+            _view.AppendColumn("PID", rightAlignment, "text", 0);
+            _view.AppendColumn("Name", leftAlignment, "text", 1);
+            _view.AppendColumn("Memory Usage", rightAlignment, "text", 2);
+            _view.AppendColumn("Priority", leftAlignment, "text", 3);
+            _view.AppendColumn("User CPU Time", rightAlignment, "text", 4);
+            _view.AppendColumn("Privileged CPU Time", rightAlignment, "text", 5);
+            _view.AppendColumn("Total CPU Time", rightAlignment, "text", 6);
+            _view.AppendColumn("Threads", rightAlignment, "text", 7);
+            _view.AppendColumn("Start Time", centerAlignment, "text", 8);
+            _view.AppendColumn("Base Priority", rightAlignment, "text", 9);
+            _view.Selection.Mode = SelectionMode.Single;
+
+            _view.RowActivated += GetRowsActive;
             // view.Show();
 
-            scrolled.Add(view);
+            scrolled.Add(_view);
 
             VBox mainVBox = new VBox(false, 0);
+            HBox topMenuHBox = new HBox(false, 3);
             HBox topHBox = new HBox(false, 20);
             VBox topLeftVBox = new VBox(false, 0);
             _topRightHBox = new HBox(false, 0);
             HBox barKillHBox = new HBox(false, 5);
             HBox naviBtnHBox = new HBox(false, 10);
+
+            Alignment topMenuAlignment = new Alignment(0.01f, 0, 0, 0);
+            topMenuAlignment.Add(topMenuHBox);
+
+            Image liveImage = new Image(Stock.Execute, IconSize.Button);
+            _liveBtn = new Button(liveImage);
+            _liveBtn.TooltipText = "Run auto refresh view";
+            Image refreshImage = new Image(Stock.Refresh, IconSize.Button);
+            _refreshBtn = new Button(refreshImage);
+            _refreshBtn.TooltipText = "Refresh view";
+            Image helpImage = new Image(Stock.Help, IconSize.Button);
+            Button helpBtn = new Button(helpImage);
+            helpBtn.TooltipText = "Help";
+            Image aboutImage = new Image(Stock.About, IconSize.Button);
+            Button aboutBtn = new Button(aboutImage);
+            aboutBtn.TooltipText = "About app";
+            _refreshBtn.Clicked += OnClickRefreshBtn;
+            aboutBtn.Clicked += OnClickAboutBtn;
+            helpBtn.Clicked += OnClickHelpBtn;
+            _liveBtn.Clicked += OnClickLiveBtn;
+
+            topMenuHBox.Add(_liveBtn);
+            topMenuHBox.Add(_refreshBtn);
+            topMenuHBox.Add(helpBtn);
+            topMenuHBox.Add(aboutBtn);
 
             Label filterLbl = new Label("Filter by:");
             _filterCb = new ComboBox(_cbStore);
@@ -139,7 +176,7 @@ namespace Codecool.ProcessWatch.GUI
             _clearKillListBtn.Clicked += OnClickClearKillListBtn;
             _infoKillBtn.Clicked += OnClickInfoKillBtn;
             _killBtn.Clicked += OnClickKillBtn;
-            
+
             barKillHBox.Add(_noProcessesToKillLbl);
             barKillHBox.Add(_infoKillBtn);
             barKillHBox.Add(_clearKillListBtn);
@@ -178,6 +215,7 @@ namespace Codecool.ProcessWatch.GUI
             Alignment naviBtnAlignment = new Alignment(0.5f, 0, 0, 0);
             naviBtnAlignment.Add(naviBtnHBox);
 
+            mainVBox.PackStart(topMenuAlignment, false, false, 10);
             mainVBox.PackStart(topHBox, true, true, 0);
             mainVBox.PackStart(scrolled, true, true, 0);
             mainVBox.PackStart(killBtnAlignment, false, false, 10);
@@ -193,50 +231,128 @@ namespace Codecool.ProcessWatch.GUI
             // }
         }
 
-        private void GetRowsActive(object o, RowActivatedArgs args)
+        private void DoWorkLiveViewUpdate(object sender, DoWorkEventArgs e)
         {
-            TreeIter iter;        
-            NodeView view = (NodeView) o;
-
-            if (view.Model.GetIter(out iter, args.Path)) {
-                string processId = (string) view.Model.GetValue(iter, 0);
-                string processName = (string) view.Model.GetValue(iter, 1);
-
-                try
+            while (_isLiveViewUpdateRun)
+            {
+                ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                Gtk.Application.Invoke(delegate
                 {
-                    _processesToKillList.Add(Int32.Parse(processId.Trim()), processName);
-                    _noProcessesToKillLbl.Text = $"Number processes to kill: {_processesToKillList.Count}   ";
-                    if (_processesToKillList.Count > 0)
-                    {
-                        _killBtn.Sensitive = true;
-                        _infoKillBtn.Sensitive = true;
-                        _clearKillListBtn.Sensitive = true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    DialogWindow("PROCESSES TO KILL - ERROR" ,e.Message, ButtonsType.Ok);
-                }
-                
+                    RemoveAllDataView();
+                    RefreshView();
+                    SetNaviBtnSensitive();
+                });
+
+                Thread.Sleep(500);
             }
         }
-        
+
+        private void OnClickLiveBtn(object sender, EventArgs e)
+        {
+            _liveViewUpdateBW.WorkerSupportsCancellation = true;
+
+            if (_isLiveViewUpdateRun == false)
+            {
+                _isLiveViewUpdateRun = true;
+                _liveViewUpdateBW.RunWorkerAsync();
+                _liveBtn.Child.Dispose();
+                _liveBtn.Image = new Image(Stock.Stop, IconSize.Button);
+                _liveBtn.TooltipText = "Stop auto refresh view";
+                _view.Selection.Mode = SelectionMode.None;
+                ClearProcessesToKillList();
+            }
+            else
+            {
+                _isLiveViewUpdateRun = false;
+                _liveViewUpdateBW.CancelAsync();
+                _liveBtn.Child.Dispose();
+                _liveBtn.Image = new Image(Stock.Execute, IconSize.Button);
+                _liveBtn.TooltipText = "Run auto refresh view";
+                _view.Selection.Mode = SelectionMode.Single;
+            }
+        }
+
+        private void StopLiveViewUpdate()
+        {
+            if (_isLiveViewUpdateRun == true)
+            {
+                _isLiveViewUpdateRun = false;
+                _liveViewUpdateBW.CancelAsync();
+                _liveBtn.Child.Dispose();
+                _liveBtn.Image = new Image(Stock.Execute, IconSize.Button);
+                _liveBtn.TooltipText = "Run auto refresh view";
+                _view.Selection.Mode = SelectionMode.Single;
+            }
+        }
+
+        private void GetRowsActive(object o, RowActivatedArgs args)
+        {
+            if (_isLiveViewUpdateRun == false)
+            {
+                TreeIter iter;
+                NodeView view = (NodeView) o;
+
+                if (view.Model.GetIter(out iter, args.Path))
+                {
+                    string processId = (string) view.Model.GetValue(iter, 0);
+                    string processName = (string) view.Model.GetValue(iter, 1);
+
+                    try
+                    {
+                        _processesToKillList.Add(Int32.Parse(processId.Trim()), processName);
+                        _noProcessesToKillLbl.Text = $"Number processes to kill: {_processesToKillList.Count}   ";
+                        if (_processesToKillList.Count > 0)
+                        {
+                            _killBtn.Sensitive = true;
+                            _infoKillBtn.Sensitive = true;
+                            _clearKillListBtn.Sensitive = true;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        DialogWindow("PROCESSES TO KILL - ERROR", e.Message, ButtonsType.Ok);
+                    }
+                }
+            }
+        }
+
+        private void OnClickRefreshBtn(object sender, EventArgs e)
+        {
+            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+            Gtk.Application.Invoke(delegate
+            {
+                RemoveAllDataView();
+                RefreshView();
+                SetNaviBtnSensitive();
+            });
+        }
+
+        private void OnClickHelpBtn(object sender, EventArgs e)
+        {
+            _ = new HelpApp(this);
+        }
+
+        private void OnClickAboutBtn(object sender, EventArgs e)
+        {
+            _ = new AboutApp(this);
+        }
+
         private void OnClickClearKillListBtn(object sender, EventArgs e)
         {
             ClearProcessesToKillList();
         }
-        
+
         private void OnClickInfoKillBtn(object sender, EventArgs e)
         {
             if (_processesToKillList.Count > 0)
             {
                 StringBuilder sb = new StringBuilder();
-                char[] charsToTrim = { ' ', '\n', '\t'};
+                char[] charsToTrim = {' ', '\n', '\t'};
                 foreach (var keyValuePair in _processesToKillList)
                 {
-                    sb.Append($"{keyValuePair.Key, -10}   {keyValuePair.Value.Trim(charsToTrim), 18}\n");
+                    sb.Append($"{keyValuePair.Key,-10}   {keyValuePair.Value.Trim(charsToTrim),18}\n");
                 }
-                
+
                 DialogWindow("PROCESSES TO KILL", sb.ToString(), ButtonsType.Close);
             }
             else
@@ -244,22 +360,25 @@ namespace Codecool.ProcessWatch.GUI
                 DialogWindow("CLEAR LIST ERROR", "Something went wrong!", ButtonsType.Close);
             }
         }
-        
+
         private void OnClickKillBtn(object sender, EventArgs e)
         {
             if (_processesToKillList.Count > 0)
             {
                 StringBuilder sb = new StringBuilder();
-                char[] charsToTrim = { ' ', '\n', '\t'};
-                
+                char[] charsToTrim = {' ', '\n', '\t'};
+
                 foreach (var keyValuePair in _processesToKillList)
                 {
                     string infoMessage = ProcessWatchApplication.KillProcess(keyValuePair.Key);
                     sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
                 }
 
-                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
+                ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                 ClearProcessesToKillList();
+                OnChangeCommonMethod();
+
+                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
             }
             else
             {
@@ -362,7 +481,7 @@ namespace Codecool.ProcessWatch.GUI
             _topRightHBox.Add(_userCpuTimeSb);
             _topRightHBox.Add(_userCpuTimeLbl);
             _userCpuTimeSb.ValueChanged += OnValueChangeUserCpuTime;
-            
+
 
             Adjustment totalCpu = new Adjustment(1.0, 0.001, 99999.999, 0.01, 1, 1);
             _totalCpuTimeSb = new SpinButton(totalCpu, 0.0, 3);
@@ -397,10 +516,10 @@ namespace Codecool.ProcessWatch.GUI
 
             _memoryUsageSb.Visible = false;
             _memoryUsageLbl.Visible = false;
-            
+
             _userCpuTimeSb.Visible = false;
             _userCpuTimeLbl.Visible = false;
-            
+
             _totalCpuTimeSb.Visible = false;
             _totalCpuTimeLbl.Visible = false;
         }
@@ -422,6 +541,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     InitAllProcesses();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes name":
                     _filterType = "ProcessesByName";
@@ -430,6 +550,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     InitProcessesByName();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes started at date":
                     _filterType = "ProcessesStartAtDate";
@@ -440,6 +561,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     InitProcessesAtDate();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes started at day":
                     _filterType = "ProcessesStartAtDay";
@@ -448,6 +570,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     InitProcessesAtDay();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes started at month":
                     _filterType = "ProcessesStartAtMonth";
@@ -456,6 +579,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startAtMonthSb.Visible = true;
                     InitProcessesAtMonth();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes started before date":
                     _filterType = "ProcessesStarBeforeDate";
@@ -466,6 +590,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startBeforeDateYearSb.Visible = true;
                     InitProcessesBeforeDate();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes started after date":
                     _filterType = "ProcessesStarAfterDate";
@@ -476,6 +601,7 @@ namespace Codecool.ProcessWatch.GUI
                     _startAfterDateYearSb.Visible = true;
                     InitProcessesAfterDate();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes physical memory usage greater than...":
                     _filterType = "ProcessesPhysicalMemoryUsage";
@@ -485,6 +611,7 @@ namespace Codecool.ProcessWatch.GUI
                     _memoryUsageLbl.Visible = true;
                     InitPhysicalMemoryUsage();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes user CPU time greater than...":
                     _filterType = "ProcessesUserCpuTime";
@@ -494,6 +621,7 @@ namespace Codecool.ProcessWatch.GUI
                     _userCpuTimeLbl.Visible = true;
                     InitUserCpuTime();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 case "- processes total CPU time greater than...":
                     _filterType = "ProcessesTotalCpuTime";
@@ -503,6 +631,7 @@ namespace Codecool.ProcessWatch.GUI
                     _totalCpuTimeLbl.Visible = true;
                     InitTotalCpuTime();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
                 default:
                     _filterType = "AllProcesses";
@@ -510,6 +639,7 @@ namespace Codecool.ProcessWatch.GUI
                     _pageNo = 1;
                     InitAllProcesses();
                     ClearProcessesToKillList();
+                    StopLiveViewUpdate();
                     break;
             }
         }
@@ -540,15 +670,15 @@ namespace Codecool.ProcessWatch.GUI
         {
             double megaBytes = _memoryUsageSb.Value;
             _memoryUsageLbl.Text = GuiUtilities.MegaByteConverter(megaBytes);
-            
+
             OnChangeCommonMethod();
         }
-        
+
         private void OnValueChangeUserCpuTime(object sender, EventArgs e)
         {
             double seconds = _userCpuTimeSb.Value;
             _userCpuTimeLbl.Text = GuiUtilities.SecondConverter(seconds);
-            
+
             OnChangeCommonMethod();
         }
 
@@ -556,7 +686,7 @@ namespace Codecool.ProcessWatch.GUI
         {
             double seconds = _totalCpuTimeSb.Value;
             _totalCpuTimeLbl.Text = GuiUtilities.SecondConverter(seconds);
-            
+
             OnChangeCommonMethod();
         }
 
@@ -574,17 +704,17 @@ namespace Codecool.ProcessWatch.GUI
         {
             OnChangeCommonMethod();
         }
-        
+
         private void OnValueChangeAtDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
-        
+
         private void OnValueChangeAtMonth(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
         }
-        
+
         private void OnValueChangeBeforeDateDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
@@ -599,7 +729,7 @@ namespace Codecool.ProcessWatch.GUI
         {
             OnChangeCommonMethod();
         }
-        
+
         private void OnValueChangeAfterDateDay(object sender, EventArgs e)
         {
             OnChangeCommonMethod();
@@ -676,7 +806,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitProcessesAtDay()
         {
             RemoveAllDataView();
@@ -697,7 +827,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitProcessesAtMonth()
         {
             RemoveAllDataView();
@@ -718,7 +848,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitProcessesBeforeDate()
         {
             RemoveAllDataView();
@@ -740,7 +870,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitProcessesAfterDate()
         {
             RemoveAllDataView();
@@ -762,11 +892,12 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitPhysicalMemoryUsage()
         {
             RemoveAllDataView();
-            var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(PageSize, _pageNo,
+            var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(PageSize,
+                _pageNo,
                 _memoryUsageSb.Value);
             _processesList = processesPhysicalMemoryUsage.ProcessesList;
             _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
@@ -783,7 +914,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitUserCpuTime()
         {
             RemoveAllDataView();
@@ -804,7 +935,7 @@ namespace Codecool.ProcessWatch.GUI
             RefreshView();
             SetNaviBtnSensitive();
         }
-        
+
         private void InitTotalCpuTime()
         {
             RemoveAllDataView();
@@ -972,33 +1103,38 @@ namespace Codecool.ProcessWatch.GUI
                     _numberOfPages = processesStartAtMonth.NumberOfPages;
                     break;
                 case "ProcessesStarBeforeDate":
-                    var processesStartBeforeDate = ProcessWatchApplication.SelectProcessesStartBeforeDate(PageSize, _pageNo,
+                    var processesStartBeforeDate = ProcessWatchApplication.SelectProcessesStartBeforeDate(PageSize,
+                        _pageNo,
                         day: (int) _startBeforeDateDaySb.Value, month: (int) _startBeforeDateMonthSb.Value,
                         year: (int) _startBeforeDateYearSb.Value);
                     _processesList = processesStartBeforeDate.ProcessesList;
                     _numberOfPages = processesStartBeforeDate.NumberOfPages;
                     break;
                 case "ProcessesStarAfterDate":
-                    var processesStartAfterDate = ProcessWatchApplication.SelectProcessesStartAfterDate(PageSize, _pageNo,
+                    var processesStartAfterDate = ProcessWatchApplication.SelectProcessesStartAfterDate(PageSize,
+                        _pageNo,
                         day: (int) _startAfterDateDaySb.Value, month: (int) _startAfterDateMonthSb.Value,
                         year: (int) _startAfterDateYearSb.Value);
                     _processesList = processesStartAfterDate.ProcessesList;
                     _numberOfPages = processesStartAfterDate.NumberOfPages;
                     break;
                 case "ProcessesPhysicalMemoryUsage":
-                    var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(PageSize, _pageNo,
+                    var processesPhysicalMemoryUsage = ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(
+                        PageSize, _pageNo,
                         _memoryUsageSb.Value);
                     _processesList = processesPhysicalMemoryUsage.ProcessesList;
                     _numberOfPages = processesPhysicalMemoryUsage.NumberOfPages;
                     break;
                 case "ProcessesUserCpuTime":
-                    var processesUserCpuTime = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(PageSize, _pageNo,
+                    var processesUserCpuTime = ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(PageSize,
+                        _pageNo,
                         _userCpuTimeSb.Value);
                     _processesList = processesUserCpuTime.ProcessesList;
                     _numberOfPages = processesUserCpuTime.NumberOfPages;
                     break;
                 case "ProcessesTotalCpuTime":
-                    var processesTotalCpuTime = ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(PageSize, _pageNo,
+                    var processesTotalCpuTime = ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(PageSize,
+                        _pageNo,
                         _totalCpuTimeSb.Value);
                     _processesList = processesTotalCpuTime.ProcessesList;
                     _numberOfPages = processesTotalCpuTime.NumberOfPages;
