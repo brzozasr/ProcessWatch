@@ -111,6 +111,9 @@ namespace Codecool.ProcessWatch.GUI
             Alignment topMenuAlignment = new Alignment(0.01f, 0, 0, 0);
             topMenuAlignment.Add(topMenuHBox);
 
+            Image liveImage = new Image(Stock.Execute, IconSize.Button);
+            Button liveBtn = new Button(liveImage);
+            liveBtn.TooltipText = "Run auto refresh view";
             Image refreshImage = new Image(Stock.Refresh, IconSize.Button);
             _refreshBtn = new Button(refreshImage);
             _refreshBtn.TooltipText = "Refresh view";
@@ -124,7 +127,7 @@ namespace Codecool.ProcessWatch.GUI
             aboutBtn.Clicked += OnClickAboutBtn;
             helpBtn.Clicked += OnClickHelpBtn;
             
-            
+            topMenuHBox.Add(liveBtn);
             topMenuHBox.Add(_refreshBtn);
             topMenuHBox.Add(helpBtn);
             topMenuHBox.Add(aboutBtn);
