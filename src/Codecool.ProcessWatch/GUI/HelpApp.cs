@@ -15,6 +15,7 @@ namespace Codecool.ProcessWatch.GUI
             TextView helpTextView = new TextView();
             ScrolledWindow scrolledWindow = new ScrolledWindow();
             helpTextView.Editable = false;
+            helpTextView.Sensitive = false;
             helpTextView.Buffer.Text = HelpText();
             scrolledWindow.Add(helpTextView);
             
