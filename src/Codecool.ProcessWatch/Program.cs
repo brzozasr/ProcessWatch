@@ -4,24 +4,71 @@ using System.Text;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.Model;
+using Codecool.ProcessWatch.View;
 using Gtk;
 
 namespace Codecool.ProcessWatch
 {
     public static class Program
     {
+        private static bool _isMainLoopRun = true;
+        private const int PageSize = 25;
+        private static int _pageNo = 1;
         public static void Main()
         {
-            while (true)
+            ScreenView screenView = new ScreenView();
+            
+            while (_isMainLoopRun)
             {
-                Console.WriteLine("Write number of page:");
+                Console.Write(screenView.MainMenu().ToString());
+                Console.Write("Enter the number or write \"exit\" to finish: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    Console.Clear();
-                    GetMenu(number);
-
-                    StartGui win = new StartGui();
+                    if (number >= 1 && number <= 11)
+                    {
+                        Console.Clear();
+                        switch (number)
+                        {
+                            case 1:
+                                screenView.GetAllProcesses(PageSize, _pageNo);
+                                break;
+                            case 2:
+                                screenView.GetProcessesByName(PageSize, _pageNo, "");
+                                break;
+                            case 3:
+                                break;
+                            case 4:
+                                break;
+                            case 5:
+                                break;
+                            case 6:
+                                break;
+                            case 7:
+                                break;
+                            case 8:
+                                break;
+                            case 9:
+                                break;
+                            case 10:
+                                break;
+                            case 11:
+                                _ = new StartGui();
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else if (input == "exit")
+                {
+                    break;
+                }
+                else
+                {
+                    continue;
                 }
             }
         }
