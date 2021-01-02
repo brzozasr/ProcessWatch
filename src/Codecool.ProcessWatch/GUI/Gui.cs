@@ -363,26 +363,39 @@ namespace Codecool.ProcessWatch.GUI
 
         private void OnClickKillBtn(object sender, EventArgs e)
         {
-            if (_processesToKillList.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                char[] charsToTrim = {' ', '\n', '\t'};
+            var response = DialogWindow("CONFIRMATION KILLS THE PROCESSES",
+                "Are you sure you want to kill the selected processes?", ButtonsType.YesNo);
 
-                foreach (var keyValuePair in _processesToKillList)
+            if (response == ResponseType.Yes)
+            {
+                if (_processesToKillList.Count > 0)
                 {
-                    string infoMessage = ProcessWatchApplication.KillProcess(keyValuePair.Key);
-                    sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
+                    StringBuilder sb = new StringBuilder();
+                    char[] charsToTrim = {' ', '\n', '\t'};
+
+                    foreach (var keyValuePair in _processesToKillList)
+                    {
+                        string infoMessage = ProcessWatchApplication.KillProcess(keyValuePair.Key);
+                        sb.Append($"{infoMessage.Trim(charsToTrim)}\n");
+                    }
+
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    
+                    Gtk.Application.Invoke(delegate
+                    {
+                        RemoveAllDataView();
+                        RefreshView();
+                        SetNaviBtnSensitive();
+                    });
+                    
+                    ClearProcessesToKillList();
+
+                    DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
                 }
-
-                ProcessWatchApplication.RefreshAllMemoryItemProcesses();
-                ClearProcessesToKillList();
-                OnChangeCommonMethod();
-
-                DialogWindow("INFO - KILL PROCESSES", sb.ToString(), ButtonsType.Close);
-            }
-            else
-            {
-                DialogWindow("KILL PROCESSES - ERROR", "Something went wrong!", ButtonsType.Close);
+                else
+                {
+                    DialogWindow("KILL PROCESSES - ERROR", "Something went wrong!", ButtonsType.Close);
+                }
             }
         }
 
@@ -537,6 +550,7 @@ namespace Codecool.ProcessWatch.GUI
             {
                 case "- processes show all":
                     _filterType = "AllProcesses";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     InitAllProcesses();
@@ -545,6 +559,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes name":
                     _filterType = "ProcessesByName";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _searchEntry.Visible = true;
                     _pageNo = 1;
@@ -554,6 +569,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes started at date":
                     _filterType = "ProcessesStartAtDate";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _startAtDateDaySb.Visible = true;
                     _startAtDateMonthSb.Visible = true;
@@ -565,6 +581,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes started at day":
                     _filterType = "ProcessesStartAtDay";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _startAtDaySb.Visible = true;
                     _pageNo = 1;
@@ -574,6 +591,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes started at month":
                     _filterType = "ProcessesStartAtMonth";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _startAtMonthSb.Visible = true;
@@ -583,6 +601,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes started before date":
                     _filterType = "ProcessesStarBeforeDate";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _startBeforeDateDaySb.Visible = true;
@@ -594,6 +613,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes started after date":
                     _filterType = "ProcessesStarAfterDate";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _startAfterDateDaySb.Visible = true;
@@ -605,6 +625,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes physical memory usage greater than...":
                     _filterType = "ProcessesPhysicalMemoryUsage";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _memoryUsageSb.Visible = true;
@@ -615,6 +636,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes user CPU time greater than...":
                     _filterType = "ProcessesUserCpuTime";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _userCpuTimeSb.Visible = true;
@@ -625,6 +647,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 case "- processes total CPU time greater than...":
                     _filterType = "ProcessesTotalCpuTime";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     _totalCpuTimeSb.Visible = true;
@@ -635,6 +658,7 @@ namespace Codecool.ProcessWatch.GUI
                     break;
                 default:
                     _filterType = "AllProcesses";
+                    OnClickRefreshBtn(null, null);
                     HideAllWidgets();
                     _pageNo = 1;
                     InitAllProcesses();
@@ -997,6 +1021,15 @@ namespace Codecool.ProcessWatch.GUI
                 _previousBtn.Sensitive = true;
                 _nextBtn.Sensitive = true;
             }
+            
+            if (_numberOfPages == 0)
+            {
+                _pageNoLbl.Text = $"0 of {_numberOfPages}";
+            }
+            else
+            {
+                _pageNoLbl.Text = $"{_pageNo} of {_numberOfPages}";
+            }
         }
 
         private void AppQuit(object o, DeleteEventArgs args)
@@ -1147,14 +1180,16 @@ namespace Codecool.ProcessWatch.GUI
             }
         }
 
-        private void DialogWindow(string title, string message, ButtonsType buttonsType)
+        private ResponseType DialogWindow(string title, string message, ButtonsType buttonsType)
         {
             MessageDialog md = new MessageDialog(this,
                 DialogFlags.Modal, MessageType.Info,
                 buttonsType, message);
             md.Title = title;
-            md.Run();
+            ResponseType response = (ResponseType) md.Run();
             md.Dispose();
+
+            return response;
         }
     }
 }
