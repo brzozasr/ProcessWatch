@@ -78,7 +78,8 @@ namespace Codecool.ProcessWatch.View
                 var allProcesses = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
                 PrintProcessesView(allProcesses.ProcessesList);
                 Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
-                Console.Write($"Enter the page number (1 - {allProcesses.NumberOfPages}) to go next page or write \"go up\" to go main menu: ");
+                Console.WriteLine("To go to the top menu write \"go up\".");
+                Console.Write($"Enter the page number (1 - {allProcesses.NumberOfPages}) to go next page or write searching phrase: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
