@@ -66,6 +66,7 @@ Michał Orłowski");
             TextView licenseTxtView = new TextView();
             licenseTxtView.Buffer.Text = License();
             licenseTxtView.Editable = false;
+            licenseTxtView.Sensitive = false;
             ScrolledWindow scrolledWindow = new ScrolledWindow();
             scrolledWindow.HeightRequest = 180;
             scrolledWindow.Add(licenseTxtView);

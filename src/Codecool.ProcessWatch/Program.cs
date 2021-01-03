@@ -1,27 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.GUI;
-using Codecool.ProcessWatch.Model;
-using Gtk;
+using Codecool.ProcessWatch.View;
 
 namespace Codecool.ProcessWatch
 {
     public static class Program
     {
+        public static bool _isMainLoopRun = true;
+        private const int PageSize = 25;
+        private static int _pageNo = 1;
         public static void Main()
         {
-            while (true)
+            ScreenView screenView = new ScreenView();
+            Console.Clear();
+            
+            while (_isMainLoopRun)
             {
-                Console.WriteLine("Write number of page:");
+                Console.Write(screenView.MainMenu().ToString());
+                Console.Write("Enter the number or write \"exit\" to finish: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
+                    if (number >= 1 && number <= 13)
+                    {
+                        Console.Clear();
+                        switch (number)
+                        {
+                            case 1:
+                                screenView.GetAllProcesses(PageSize, _pageNo);
+                                break;
+                            case 2:
+                                screenView.GetProcessesByName(PageSize, _pageNo, "");
+                                break;
+                            case 3:
+                                var todayDate = DateTime.Today;
+                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month, todayDate.Year);
+                                break;
+                            case 4:
+                                break;
+                            case 5:
+                                break;
+                            case 6:
+                                break;
+                            case 7:
+                                break;
+                            case 8:
+                                break;
+                            case 9:
+                                break;
+                            case 10:
+                                break;
+                            case 11:
+                                _ = new StartGui();
+                                break;
+                            case 12:
+                                ViewHelper.HelpInfo();
+                                break;
+                            case 13:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (input == "--exit")
+                {
+                    break;
+                }
+                else
+                {
                     Console.Clear();
-                    GetMenu(number);
-
-                    StartGui win = new StartGui();
+                    continue;
                 }
             }
         }

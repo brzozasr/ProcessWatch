@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Codecool.ProcessWatch.Model;
 
@@ -297,34 +298,38 @@ namespace Codecool.ProcessWatch.Controller
             {
                 Process.GetProcessById(id).Kill();
                 RefreshAllMemoryItemProcesses();
-                Console.WriteLine($"Process with an Id of {id} was killed.");
+                // Console.WriteLine($"Process with an Id of {id} was killed.");
                 return $"Process with an Id of {id} was killed.";
             }
             catch (Exception e)
             {
                 RefreshAllMemoryItemProcesses();
-                Console.WriteLine(e.Message);
+                // Console.WriteLine(e.Message);
                 return e.Message;
             }
         }
         
-        public static void KillProcesses(List<MemoryItemProcess> tmpList)
+        public static StringBuilder KillProcesses(List<MemoryItemProcess> tmpList)
         {
+            StringBuilder sb = new StringBuilder();
+            
             if (tmpList.Count > 0)
             {
                 tmpList.ForEach(x =>
                 {
                     if (x.ProcessId.HasValue)
                     {
-                        KillProcess(x.ProcessId.Value);
+                        var message = KillProcess(x.ProcessId.Value);
+                        sb.Append($"{message}\n");
                     }
                 });
+                return sb;
             }
             else
             {
                 Console.WriteLine("There are no processes to kill.");
+                return sb;
             }
-            
         }
 
         private static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) ProcessesPagination(
