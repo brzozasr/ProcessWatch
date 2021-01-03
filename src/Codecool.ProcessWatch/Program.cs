@@ -63,6 +63,7 @@ namespace Codecool.ProcessWatch
                                 ViewHelper.HelpInfo();
                                 break;
                             case 13:
+                                ViewHelper.AboutApp();
                                 break;
                         }
                     }

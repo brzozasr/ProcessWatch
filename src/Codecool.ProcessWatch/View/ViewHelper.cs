@@ -38,5 +38,28 @@ namespace Codecool.ProcessWatch.View
             Console.ReadKey();
             Console.Clear();
         }
+
+        public static void AboutApp()
+        {
+            string about = @"        Process Watch
+        
+        Version: 1.0
+
+        Authors:
+        Sławomir Brzozowski, Michał Orłowski
+
+        Web page:
+        https://github.com/brzozasr/ProcessWatch
+
+        License:
+        Apache License
+        Version 2.0, January 2004
+        http://www.apache.org/licenses/";
+            
+            Console.WriteLine(about);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+            Console.Clear();
+        }
     }
 }
