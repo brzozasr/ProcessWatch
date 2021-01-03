@@ -26,7 +26,7 @@ namespace Codecool.ProcessWatch
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= 11)
+                    if (number >= 1 && number <= 13)
                     {
                         Console.Clear();
                         switch (number)
@@ -58,6 +58,11 @@ namespace Codecool.ProcessWatch
                             case 11:
                                 _ = new StartGui();
                                 break;
+                            case 12:
+                                ViewHelper.HelpInfo();
+                                break;
+                            case 13:
+                                break;
                         }
                     }
                     else
@@ -66,7 +71,7 @@ namespace Codecool.ProcessWatch
                         continue;
                     }
                 }
-                else if (input == "exit")
+                else if (input == "--exit")
                 {
                     break;
                 }

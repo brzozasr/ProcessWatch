@@ -30,7 +30,9 @@ namespace Codecool.ProcessWatch.View
                 " (8)  Filter processes physical memory usage greater than",
                 " (9)  Filter processes user CPU time greater than",
                 "(10)  Filter processes total CPU time greater than",
-                "(11)  Run Process Watch GUI"
+                "(11)  Run Process Watch GUI",
+                "(12)  Help information",
+                "(13)  About application"
             };
 
             foreach (var menuItem in menuItems)
@@ -47,6 +49,8 @@ namespace Codecool.ProcessWatch.View
             {
                 var allProcesses = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
                 PrintProcessesView(allProcesses.ProcessesList);
+                
+                Console.Write("ALL PROCESSES: ");
                 int startPage = 1;
                 if (allProcesses.NumberOfPages == 0)
                 {
@@ -59,9 +63,7 @@ namespace Codecool.ProcessWatch.View
                     startPage = 1;
                 }
                 
-                Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                Console.WriteLine("To refresh the processes view write \"--rf\".");
                 Console.Write($"Enter the page number ({startPage} - {allProcesses.NumberOfPages}) to go next page: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -88,6 +90,12 @@ namespace Codecool.ProcessWatch.View
                     Console.Clear();
                     break;
                 }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
                 else
                 {
                     Console.Clear();
@@ -102,6 +110,8 @@ namespace Codecool.ProcessWatch.View
             {
                 var processesByName = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
                 PrintProcessesView(processesByName.ProcessesList);
+                
+                Console.Write("PROCESSES FILTER BY NAME: ");
                 int startPage = 1;
                 if (processesByName.NumberOfPages == 0)
                 {
@@ -115,7 +125,6 @@ namespace Codecool.ProcessWatch.View
                 }
                 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                Console.WriteLine("To refresh the processes view write \"--rf\".");
                 Console.Write($"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -142,6 +151,12 @@ namespace Codecool.ProcessWatch.View
                     Console.Clear();
                     break;
                 }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
                 else
                 {
                     Console.Clear();
@@ -157,6 +172,8 @@ namespace Codecool.ProcessWatch.View
             {
                 var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, pageNo, day, month, year);
                 PrintProcessesView(processesAtDate.ProcessesList);
+                
+                Console.Write("PROCESSES FILTER BY DATE: ");
                 int startPage = 1;
                 if (processesAtDate.NumberOfPages == 0)
                 {
@@ -173,7 +190,6 @@ namespace Codecool.ProcessWatch.View
                 Regex regx = new Regex(pattern);
                 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                Console.WriteLine("To refresh the processes view write \"--rf\".");
                 Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -199,6 +215,12 @@ namespace Codecool.ProcessWatch.View
                 {
                     Console.Clear();
                     break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
                 }
                 else if (!string.IsNullOrEmpty(input) && regx.IsMatch(input))
                 {
