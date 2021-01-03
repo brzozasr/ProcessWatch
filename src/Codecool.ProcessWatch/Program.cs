@@ -38,6 +38,8 @@ namespace Codecool.ProcessWatch
                                 screenView.GetProcessesByName(PageSize, _pageNo, "");
                                 break;
                             case 3:
+                                var todayDate = DateTime.Today;
+                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month, todayDate.Year);
                                 break;
                             case 4:
                                 break;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Codecool.ProcessWatch.Controller;
@@ -149,8 +150,84 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
+        
+        public void GetProcessesStartedAtDate(int pageSize, int pageNo, int day, int month, int year)
+        {
+            while (true)
+            {
+                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, pageNo, day, month, year);
+                PrintProcessesView(processesAtDate.ProcessesList);
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+                
+                string pattern = @"^([0]|[1]|[2]|[3])([0-9]).([0]|[1])([0-9]).([2]|[3])([0-9])([0-9])([0-9])$";
+                Regex regx = new Regex(pattern);
+                
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+                Console.WriteLine("To refresh the processes view write \"--rf\".");
+                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regx.IsMatch(input))
+                {
+                    var arrayDate = input.Split('.');
 
-        public void PrintProcessesView(List<MemoryItemProcess> processesList)
+                    try
+                    {
+                        _ = new DateTime(Int32.Parse(arrayDate[2]), Int32.Parse(arrayDate[1]), Int32.Parse(arrayDate[0]));
+                        day = Int32.Parse(arrayDate[0]);
+                        month = Int32.Parse(arrayDate[1]);
+                        year = Int32.Parse(arrayDate[2]);
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    catch (Exception)
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    continue;
+                }
+            }
+        }
+
+        private void PrintProcessesView(List<MemoryItemProcess> processesList)
         {
             StringBuilder sb = new StringBuilder();
 
