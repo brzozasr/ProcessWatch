@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.Model;
 
@@ -42,8 +46,22 @@ namespace Codecool.ProcessWatch.View
             {
                 var allProcesses = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
                 PrintProcessesView(allProcesses.ProcessesList);
+                int startPage = 1;
+                if (allProcesses.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {allProcesses.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
+                    startPage = 1;
+                }
+                
                 Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
-                Console.Write($"Enter the page number (1 - {allProcesses.NumberOfPages}) to go next page or write \"go up\" to go main menu: ");
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+                Console.WriteLine("To refresh the processes view write \"--rf\".");
+                Console.Write($"Enter the page number ({startPage} - {allProcesses.NumberOfPages}) to go next page: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -58,7 +76,13 @@ namespace Codecool.ProcessWatch.View
                         continue;
                     }
                 }
-                else if (input == "go up")
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
                 {
                     Console.Clear();
                     break;
@@ -70,20 +94,32 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesByName(int pageSize, int pageNo, string searchString)
         {
             while (true)
             {
-                var allProcesses = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
-                PrintProcessesView(allProcesses.ProcessesList);
-                Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
-                Console.WriteLine("To go to the top menu write \"go up\".");
-                Console.Write($"Enter the page number (1 - {allProcesses.NumberOfPages}) to go next page or write searching phrase: ");
+                var processesByName = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
+                PrintProcessesView(processesByName.ProcessesList);
+                int startPage = 1;
+                if (processesByName.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesByName.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesByName.NumberOfPages}");
+                    startPage = 1;
+                }
+                
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+                Console.WriteLine("To refresh the processes view write \"--rf\".");
+                Console.Write($"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= allProcesses.NumberOfPages)
+                    if (number >= 1 && number <= processesByName.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -94,7 +130,13 @@ namespace Codecool.ProcessWatch.View
                         continue;
                     }
                 }
-                else if (input == "go up")
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
                 {
                     Console.Clear();
                     break;
@@ -114,8 +156,8 @@ namespace Codecool.ProcessWatch.View
 
             string line = new String('-', 145);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+
             sb.Append($"+{line}+\n");
 
             sb.Append($"| {"",7} " +

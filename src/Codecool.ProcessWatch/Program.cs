@@ -17,6 +17,7 @@ namespace Codecool.ProcessWatch
         public static void Main()
         {
             ScreenView screenView = new ScreenView();
+            Console.Clear();
             
             while (_isMainLoopRun)
             {
@@ -59,6 +60,7 @@ namespace Codecool.ProcessWatch
                     }
                     else
                     {
+                        Console.Clear();
                         continue;
                     }
                 }
@@ -68,6 +70,7 @@ namespace Codecool.ProcessWatch
                 }
                 else
                 {
+                    Console.Clear();
                     continue;
                 }
             }
