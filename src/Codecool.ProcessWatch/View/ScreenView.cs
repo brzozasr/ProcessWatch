@@ -13,6 +13,7 @@ namespace Codecool.ProcessWatch.View
 {
     public class ScreenView
     {
+        private StringBuilder _messenger = new StringBuilder();
         public StringBuilder MainMenu()
         {
             StringBuilder sb = new StringBuilder();
@@ -45,6 +46,9 @@ namespace Codecool.ProcessWatch.View
 
         public void GetAllProcesses(int pageSize, int pageNo)
         {
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+            
             while (true)
             {
                 var allProcesses = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
@@ -64,6 +68,16 @@ namespace Codecool.ProcessWatch.View
                 }
                 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+                
                 Console.Write($"Enter the page number ({startPage} - {allProcesses.NumberOfPages}) to go next page: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -96,6 +110,30 @@ namespace Codecool.ProcessWatch.View
                     ViewHelper.HelpInfo();
                     continue;
                 }
+                else if (input == "--exit")
+                {
+                    Program._isMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int prosessId = Int32.Parse(input.Substring(position));
+
+                    Console.Clear();
+                    string message = ProcessWatchApplication.KillProcess(prosessId);
+                    _messenger.Append($"{message}\n");
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Clear();
+                    StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                    _messenger.Append(messages);
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
                 else
                 {
                     Console.Clear();
@@ -106,6 +144,12 @@ namespace Codecool.ProcessWatch.View
 
         public void GetProcessesByName(int pageSize, int pageNo, string searchString)
         {
+            string pattern = @"^--search=.*$";
+            Regex regx = new Regex(pattern);
+            
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+            
             while (true)
             {
                 var processesByName = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
@@ -125,7 +169,17 @@ namespace Codecool.ProcessWatch.View
                 }
                 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                Console.Write($"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase: ");
+                
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+                
+                Console.Write($"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase (--search=phrase): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -157,17 +211,55 @@ namespace Codecool.ProcessWatch.View
                     ViewHelper.HelpInfo();
                     continue;
                 }
+                else if (input == "--exit")
+                {
+                    Program._isMainLoopRun = false;
+                    break;
+                }
+                else if (input != null && regx.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string search = input.Substring(position);
+
+                    Console.Clear();
+                    searchString = search;
+                    pageNo = 1;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int prosessId = Int32.Parse(input.Substring(position));
+
+                    Console.Clear();
+                    string message = ProcessWatchApplication.KillProcess(prosessId);
+                    _messenger.Append($"{message}\n");
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Clear();
+                    StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                    _messenger.Append(messages);
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
                 else
                 {
                     Console.Clear();
-                    searchString = input;
-                    pageNo = 1;
+                    continue;
                 }
             }
         }
         
         public void GetProcessesStartedAtDate(int pageSize, int pageNo, int day, int month, int year)
         {
+            string pattern = @"^([0]|[1]|[2]|[3])([0-9]).([0]|[1])([0-9]).([2]|[3])([0-9])([0-9])([0-9])$";
+            Regex regx = new Regex(pattern);
+            
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+            
             while (true)
             {
                 var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, pageNo, day, month, year);
@@ -185,11 +277,18 @@ namespace Codecool.ProcessWatch.View
                     Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
                     startPage = 1;
                 }
-                
-                string pattern = @"^([0]|[1]|[2]|[3])([0-9]).([0]|[1])([0-9]).([2]|[3])([0-9])([0-9])([0-9])$";
-                Regex regx = new Regex(pattern);
-                
+
                 Console.WriteLine("To go to the top menu write \"--gu\".");
+                
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+                
                 Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -222,6 +321,11 @@ namespace Codecool.ProcessWatch.View
                     ViewHelper.HelpInfo();
                     continue;
                 }
+                else if (input == "--exit")
+                {
+                    Program._isMainLoopRun = false;
+                    break;
+                }
                 else if (!string.IsNullOrEmpty(input) && regx.IsMatch(input))
                 {
                     var arrayDate = input.Split('.');
@@ -241,6 +345,25 @@ namespace Codecool.ProcessWatch.View
                         continue;
                     }
                 }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int prosessId = Int32.Parse(input.Substring(position));
+
+                    Console.Clear();
+                    string message = ProcessWatchApplication.KillProcess(prosessId);
+                    _messenger.Append($"{message}\n");
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Clear();
+                    StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                    _messenger.Append(messages);
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
                 else
                 {
                     Console.Clear();
@@ -254,8 +377,6 @@ namespace Codecool.ProcessWatch.View
             StringBuilder sb = new StringBuilder();
 
             string line = new String('-', 145);
-
-            Console.ForegroundColor = ConsoleColor.DarkRed;
 
             sb.Append($"+{line}+\n");
 
@@ -305,7 +426,11 @@ namespace Codecool.ProcessWatch.View
             sb.Append($"+{line}+\n");
 
             Console.Write(sb.ToString());
-            Console.ResetColor();
+        }
+
+        private void Messenger(StringBuilder messages)
+        {
+            _messenger.Append(messages);
         }
 
         /* EXAMPLE OF PRINTING ALL PROCESSES WITH PAGINATION

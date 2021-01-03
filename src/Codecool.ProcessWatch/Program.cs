@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.GUI;
-using Codecool.ProcessWatch.Model;
 using Codecool.ProcessWatch.View;
-using Gtk;
 
 namespace Codecool.ProcessWatch
 {
     public static class Program
     {
-        private static bool _isMainLoopRun = true;
+        public static bool _isMainLoopRun = true;
         private const int PageSize = 25;
         private static int _pageNo = 1;
         public static void Main()
