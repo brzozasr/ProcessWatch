@@ -8,7 +8,7 @@ namespace Codecool.ProcessWatch
 {
     public static class Program
     {
-        public static bool _isMainLoopRun = true;
+        public static bool IsMainLoopRun = true;
         private const int PageSize = 25;
         private static int _pageNo = 1;
         public static void Main()
@@ -16,7 +16,7 @@ namespace Codecool.ProcessWatch
             ScreenView screenView = new ScreenView();
             Console.Clear();
             
-            while (_isMainLoopRun)
+            while (IsMainLoopRun)
             {
                 Console.Write(screenView.MainMenu().ToString());
                 Console.Write("Enter the number or write \"exit\" to finish: ");
@@ -39,8 +39,12 @@ namespace Codecool.ProcessWatch
                                 screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month, todayDate.Year);
                                 break;
                             case 4:
+                                var todayDay = DateTime.Today.Day;
+                                screenView.GetProcessesStartedAtDay(PageSize, _pageNo, todayDay);
                                 break;
                             case 5:
+                                var todayMonth = DateTime.Today.Month;
+                                screenView.GetProcessesStartedAtMonth(PageSize, _pageNo, todayMonth);
                                 break;
                             case 6:
                                 break;

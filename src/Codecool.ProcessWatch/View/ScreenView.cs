@@ -112,7 +112,7 @@ namespace Codecool.ProcessWatch.View
                 }
                 else if (input == "--exit")
                 {
-                    Program._isMainLoopRun = false;
+                    Program.IsMainLoopRun = false;
                     break;
                 }
                 else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
@@ -213,7 +213,7 @@ namespace Codecool.ProcessWatch.View
                 }
                 else if (input == "--exit")
                 {
-                    Program._isMainLoopRun = false;
+                    Program.IsMainLoopRun = false;
                     break;
                 }
                 else if (input != null && regx.IsMatch(input))
@@ -323,7 +323,7 @@ namespace Codecool.ProcessWatch.View
                 }
                 else if (input == "--exit")
                 {
-                    Program._isMainLoopRun = false;
+                    Program.IsMainLoopRun = false;
                     break;
                 }
                 else if (!string.IsNullOrEmpty(input) && regx.IsMatch(input))
@@ -340,6 +340,242 @@ namespace Codecool.ProcessWatch.View
                         Console.Clear();
                     }
                     catch (Exception)
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int prosessId = Int32.Parse(input.Substring(position));
+
+                    Console.Clear();
+                    string message = ProcessWatchApplication.KillProcess(prosessId);
+                    _messenger.Append($"{message}\n");
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Clear();
+                    StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                    _messenger.Append(messages);
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else
+                {
+                    Console.Clear();
+                    continue;
+                }
+            }
+        }
+        
+        public void GetProcessesStartedAtDay(int pageSize, int pageNo, int day)
+        {
+            string patternDay = @"^--day=[0-3][0-9]$";
+            Regex regxDay = new Regex(patternDay);
+            
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+            
+            while (true)
+            {
+                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDay(pageSize, pageNo, day);
+                PrintProcessesView(processesAtDate.ProcessesList);
+                
+                Console.Write("PROCESSES FILTER BY DAY: ");
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+                
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+                
+                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write day of month (--day=DD): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxDay.IsMatch(input))
+                {
+                    var positionDay = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int inputDay = Int32.Parse(input.Substring(positionDay));
+
+                    if (inputDay >= 1 && inputDay <= 31)
+                    {
+                        day = inputDay;
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int prosessId = Int32.Parse(input.Substring(position));
+
+                    Console.Clear();
+                    string message = ProcessWatchApplication.KillProcess(prosessId);
+                    _messenger.Append($"{message}\n");
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Clear();
+                    StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                    _messenger.Append(messages);
+                    pageNo = 1;
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                }
+                else
+                {
+                    Console.Clear();
+                    continue;
+                }
+            }
+        }
+        
+        public void GetProcessesStartedAtMonth(int pageSize, int pageNo, int month)
+        {
+            string patternMonth = @"^--month=[0-1][0-9]$";
+            Regex regxMonth = new Regex(patternMonth);
+            
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+            
+            while (true)
+            {
+                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtMonth(pageSize, pageNo, month);
+                PrintProcessesView(processesAtDate.ProcessesList);
+                
+                Console.Write("PROCESSES FILTER BY MONTH: ");
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+                
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+                
+                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write a month (--month=MM): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxMonth.IsMatch(input))
+                {
+                    var positionMonth = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    int inputMonth = Int32.Parse(input.Substring(positionMonth));
+
+                    if (inputMonth >= 1 && inputMonth <= 12)
+                    {
+                        month = inputMonth;
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    else
                     {
                         Console.Clear();
                         continue;

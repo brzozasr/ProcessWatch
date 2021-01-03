@@ -20,8 +20,18 @@ namespace Codecool.ProcessWatch.View
                                 to turn off the computer.
 
     Submenu ""Filter processes by name"":
-        --search=[phrase]       searches given phrase (to show all processes again
-                                write --search=).";
+        --search=[phrase]       searches processes name with given phrase 
+                                (to show all processes again write --search=).
+    
+    Submenu ""Filter processes by day"":
+        --day=[DD]              searches for processes that have started on 
+                                a given day takes into account all processes 
+                                from each month.
+
+    Submenu ""Filter processes by month"":
+        --month=[MM]            searches for processes that have started on 
+                                a given month takes into account all 
+                                processes from each month.";
 
             Console.WriteLine(help);
             Console.WriteLine("Press any key to continue...");
