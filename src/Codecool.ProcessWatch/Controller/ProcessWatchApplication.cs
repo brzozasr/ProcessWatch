@@ -68,11 +68,11 @@ namespace Codecool.ProcessWatch.Controller
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
         {
-            minute ??= DateTime.Now.Minute;
-            hour ??= DateTime.Now.Hour;
-            day ??= DateTime.Now.Day;
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
+            minute ??= DateTime.Today.Minute;
+            hour ??= DateTime.Today.Hour;
+            day ??= DateTime.Today.Day;
+            month ??= DateTime.Today.Month;
+            year ??= DateTime.Today.Year;
 
             // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
@@ -111,11 +111,11 @@ namespace Codecool.ProcessWatch.Controller
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
         {
-            minute ??= DateTime.Now.Minute;
-            hour ??= DateTime.Now.Hour;
-            day ??= DateTime.Now.Day;
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
+            minute ??= DateTime.Today.Minute;
+            hour ??= DateTime.Today.Hour;
+            day ??= DateTime.Today.Day;
+            month ??= DateTime.Today.Month;
+            year ??= DateTime.Today.Year;
 
             // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 

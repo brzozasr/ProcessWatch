@@ -11,11 +11,12 @@ namespace Codecool.ProcessWatch
         public static bool IsMainLoopRun = true;
         private const int PageSize = 25;
         private static int _pageNo = 1;
+
         public static void Main()
         {
             ScreenView screenView = new ScreenView();
             Console.Clear();
-            
+
             while (IsMainLoopRun)
             {
                 Console.Write(screenView.MainMenu().ToString());
@@ -36,7 +37,8 @@ namespace Codecool.ProcessWatch
                                 break;
                             case 3:
                                 var todayDate = DateTime.Today;
-                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month, todayDate.Year);
+                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month,
+                                    todayDate.Year);
                                 break;
                             case 4:
                                 var todayDay = DateTime.Today.Day;
@@ -47,8 +49,14 @@ namespace Codecool.ProcessWatch
                                 screenView.GetProcessesStartedAtMonth(PageSize, _pageNo, todayMonth);
                                 break;
                             case 6:
+                                var todayBeforeDate = DateTime.Today;
+                                screenView.GetProcessesStartedBeforeDate(PageSize, _pageNo, todayBeforeDate.Day,
+                                    todayBeforeDate.Month, todayBeforeDate.Year);
                                 break;
                             case 7:
+                                var todayAfterDate = DateTime.Today;
+                                screenView.GetProcessesStartedAfterDate(PageSize, _pageNo, todayAfterDate.Day,
+                                    todayAfterDate.Month, todayAfterDate.Year);
                                 break;
                             case 8:
                                 break;

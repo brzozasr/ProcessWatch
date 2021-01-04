@@ -14,6 +14,7 @@ namespace Codecool.ProcessWatch.View
     public class ScreenView
     {
         private StringBuilder _messenger = new StringBuilder();
+
         public StringBuilder MainMenu()
         {
             StringBuilder sb = new StringBuilder();
@@ -48,12 +49,12 @@ namespace Codecool.ProcessWatch.View
         {
             string patternKill = @"^--kill=[0-9]+$";
             Regex regxKill = new Regex(patternKill);
-            
+
             while (true)
             {
                 var allProcesses = ProcessWatchApplication.AllProcesses(pageSize, pageNo);
                 PrintProcessesView(allProcesses.ProcessesList);
-                
+
                 Console.Write("ALL PROCESSES: ");
                 int startPage = 1;
                 if (allProcesses.NumberOfPages == 0)
@@ -66,7 +67,7 @@ namespace Codecool.ProcessWatch.View
                     Console.WriteLine($"Page {pageNo} of {allProcesses.NumberOfPages}");
                     startPage = 1;
                 }
-                
+
                 Console.WriteLine("To go to the top menu write \"--gu\".");
 
                 if (!string.IsNullOrEmpty(_messenger.ToString()))
@@ -77,7 +78,7 @@ namespace Codecool.ProcessWatch.View
                     _messenger.Clear();
                     Console.ResetColor();
                 }
-                
+
                 Console.Write($"Enter the page number ({startPage} - {allProcesses.NumberOfPages}) to go next page: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
@@ -121,7 +122,7 @@ namespace Codecool.ProcessWatch.View
                     var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
                     string prosessIdStr = input.Substring(position);
 
-                    if (Int32.TryParse(prosessIdStr , out var prosessId))
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
                     {
                         Console.Write("Are you sure you want to kill the process (y/n): ");
                         string confirmation = Console.ReadLine();
@@ -134,6 +135,7 @@ namespace Codecool.ProcessWatch.View
                             pageNo = 1;
                             ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                         }
+
                         Console.Clear();
                     }
                     else
@@ -155,6 +157,7 @@ namespace Codecool.ProcessWatch.View
                         pageNo = 1;
                         ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                     }
+
                     Console.Clear();
                 }
                 else
@@ -170,15 +173,15 @@ namespace Codecool.ProcessWatch.View
         {
             string patternSearch = @"^--search=.*$";
             Regex regxSearch = new Regex(patternSearch);
-            
+
             string patternKill = @"^--kill=[0-9]+$";
             Regex regxKill = new Regex(patternKill);
-            
+
             while (true)
             {
                 var processesByName = ProcessWatchApplication.SelectProcessesByName(pageSize, pageNo, searchString);
                 PrintProcessesView(processesByName.ProcessesList);
-                
+
                 Console.Write("PROCESSES FILTER BY NAME: ");
                 int startPage = 1;
                 if (processesByName.NumberOfPages == 0)
@@ -191,9 +194,9 @@ namespace Codecool.ProcessWatch.View
                     Console.WriteLine($"Page {pageNo} of {processesByName.NumberOfPages}");
                     startPage = 1;
                 }
-                
+
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                
+
                 if (!string.IsNullOrEmpty(_messenger.ToString()))
                 {
                     char[] charsToTrim = {' ', '\n', '\t'};
@@ -202,8 +205,9 @@ namespace Codecool.ProcessWatch.View
                     _messenger.Clear();
                     Console.ResetColor();
                 }
-                
-                Console.Write($"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase (--search=phrase): ");
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesByName.NumberOfPages}) to go next page or write searching phrase (--search=phrase): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -255,7 +259,7 @@ namespace Codecool.ProcessWatch.View
                     var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
                     string prosessIdStr = input.Substring(position);
 
-                    if (Int32.TryParse(prosessIdStr , out var prosessId))
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
                     {
                         Console.Write("Are you sure you want to kill the process (y/n): ");
                         string confirmation = Console.ReadLine();
@@ -268,6 +272,7 @@ namespace Codecool.ProcessWatch.View
                             pageNo = 1;
                             ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                         }
+
                         Console.Clear();
                     }
                     else
@@ -289,6 +294,7 @@ namespace Codecool.ProcessWatch.View
                         pageNo = 1;
                         ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                     }
+
                     Console.Clear();
                 }
                 else
@@ -299,20 +305,21 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesStartedAtDate(int pageSize, int pageNo, int day, int month, int year)
         {
             string patternDate = @"^([0-3])([0-9]).([0-1])([0-9]).([2-3])([0-9])([0-9])([0-9])$";
             Regex regxDate = new Regex(patternDate);
-            
+
             string patternKill = @"^--kill=[0-9]+$";
             Regex regxKill = new Regex(patternKill);
-            
+
             while (true)
             {
-                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, pageNo, day, month, year);
+                var processesAtDate =
+                    ProcessWatchApplication.SelectProcessesStartAtDate(pageSize, pageNo, day, month, year);
                 PrintProcessesView(processesAtDate.ProcessesList);
-                
+
                 Console.Write("PROCESSES FILTER BY DATE: ");
                 int startPage = 1;
                 if (processesAtDate.NumberOfPages == 0)
@@ -327,7 +334,7 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                
+
                 if (!string.IsNullOrEmpty(_messenger.ToString()))
                 {
                     char[] charsToTrim = {' ', '\n', '\t'};
@@ -336,8 +343,9 @@ namespace Codecool.ProcessWatch.View
                     _messenger.Clear();
                     Console.ResetColor();
                 }
-                
-                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -381,7 +389,8 @@ namespace Codecool.ProcessWatch.View
 
                     try
                     {
-                        _ = new DateTime(Int32.Parse(arrayDate[2]), Int32.Parse(arrayDate[1]), Int32.Parse(arrayDate[0]));
+                        _ = new DateTime(Int32.Parse(arrayDate[2]), Int32.Parse(arrayDate[1]),
+                            Int32.Parse(arrayDate[0]));
                         day = Int32.Parse(arrayDate[0]);
                         month = Int32.Parse(arrayDate[1]);
                         year = Int32.Parse(arrayDate[2]);
@@ -400,7 +409,7 @@ namespace Codecool.ProcessWatch.View
                     var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
                     string prosessIdStr = input.Substring(position);
 
-                    if (Int32.TryParse(prosessIdStr , out var prosessId))
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
                     {
                         Console.Write("Are you sure you want to kill the process (y/n): ");
                         string confirmation = Console.ReadLine();
@@ -413,6 +422,7 @@ namespace Codecool.ProcessWatch.View
                             pageNo = 1;
                             ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                         }
+
                         Console.Clear();
                     }
                     else
@@ -434,6 +444,7 @@ namespace Codecool.ProcessWatch.View
                         pageNo = 1;
                         ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                     }
+
                     Console.Clear();
                 }
                 else
@@ -444,20 +455,20 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesStartedAtDay(int pageSize, int pageNo, int day)
         {
             string patternDay = @"^--day=[0-3][0-9]$";
             Regex regxDay = new Regex(patternDay);
-            
+
             string patternKill = @"^--kill=[0-9]+$";
             Regex regxKill = new Regex(patternKill);
-            
+
             while (true)
             {
                 var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDay(pageSize, pageNo, day);
                 PrintProcessesView(processesAtDate.ProcessesList);
-                
+
                 Console.Write("PROCESSES FILTER BY DAY: ");
                 int startPage = 1;
                 if (processesAtDate.NumberOfPages == 0)
@@ -472,7 +483,7 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                
+
                 if (!string.IsNullOrEmpty(_messenger.ToString()))
                 {
                     char[] charsToTrim = {' ', '\n', '\t'};
@@ -481,8 +492,9 @@ namespace Codecool.ProcessWatch.View
                     _messenger.Clear();
                     Console.ResetColor();
                 }
-                
-                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write day of month (--day=DD): ");
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write day of month (--day=DD): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -534,7 +546,8 @@ namespace Codecool.ProcessWatch.View
                     else
                     {
                         Console.Clear();
-                        _messenger.Append($"You entered an incorrect day of the month ({input.Substring(positionDay)}).");
+                        _messenger.Append(
+                            $"You entered an incorrect day of the month ({input.Substring(positionDay)}).");
                         continue;
                     }
                 }
@@ -543,7 +556,7 @@ namespace Codecool.ProcessWatch.View
                     var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
                     string prosessIdStr = input.Substring(position);
 
-                    if (Int32.TryParse(prosessIdStr , out var prosessId))
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
                     {
                         Console.Write("Are you sure you want to kill the process (y/n): ");
                         string confirmation = Console.ReadLine();
@@ -556,6 +569,7 @@ namespace Codecool.ProcessWatch.View
                             pageNo = 1;
                             ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                         }
+
                         Console.Clear();
                     }
                     else
@@ -577,6 +591,7 @@ namespace Codecool.ProcessWatch.View
                         pageNo = 1;
                         ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                     }
+
                     Console.Clear();
                 }
                 else
@@ -587,20 +602,20 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesStartedAtMonth(int pageSize, int pageNo, int month)
         {
             string patternMonth = @"^--month=[0-1][0-9]$";
             Regex regxMonth = new Regex(patternMonth);
-            
+
             string patternKill = @"^--kill=[0-9]+$";
             Regex regxKill = new Regex(patternKill);
-            
+
             while (true)
             {
                 var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtMonth(pageSize, pageNo, month);
                 PrintProcessesView(processesAtDate.ProcessesList);
-                
+
                 Console.Write("PROCESSES FILTER BY MONTH: ");
                 int startPage = 1;
                 if (processesAtDate.NumberOfPages == 0)
@@ -615,7 +630,7 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.WriteLine("To go to the top menu write \"--gu\".");
-                
+
                 if (!string.IsNullOrEmpty(_messenger.ToString()))
                 {
                     char[] charsToTrim = {' ', '\n', '\t'};
@@ -624,8 +639,9 @@ namespace Codecool.ProcessWatch.View
                     _messenger.Clear();
                     Console.ResetColor();
                 }
-                
-                Console.Write($"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write a month (--month=MM): ");
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write a month (--month=MM): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
@@ -686,7 +702,7 @@ namespace Codecool.ProcessWatch.View
                     var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
                     string prosessIdStr = input.Substring(position);
 
-                    if (Int32.TryParse(prosessIdStr , out var prosessId))
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
                     {
                         Console.Write("Are you sure you want to kill the process (y/n): ");
                         string confirmation = Console.ReadLine();
@@ -699,6 +715,7 @@ namespace Codecool.ProcessWatch.View
                             pageNo = 1;
                             ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                         }
+
                         Console.Clear();
                     }
                     else
@@ -720,6 +737,307 @@ namespace Codecool.ProcessWatch.View
                         pageNo = 1;
                         ProcessWatchApplication.RefreshAllMemoryItemProcesses();
                     }
+
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.Clear();
+                    _messenger.Append($"You have entered incorrect data ({input}).");
+                    continue;
+                }
+            }
+        }
+
+        public void GetProcessesStartedBeforeDate(int pageSize, int pageNo, int day, int month, int year)
+        {
+            string patternDate = @"^([0-3])([0-9]).([0-1])([0-9]).([2-3])([0-9])([0-9])([0-9])$";
+            Regex regxDate = new Regex(patternDate);
+
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+
+            while (true)
+            {
+                var processesAtDate =
+                    ProcessWatchApplication.SelectProcessesStartBeforeDate(pageSize, pageNo, day: day, month: month, year: year);
+                PrintProcessesView(processesAtDate.ProcessesList);
+
+                Console.Write("PROCESSES STARTED BEFORE GIVEN DATE: ");
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You have entered the wrong  page number ({number}).");
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxDate.IsMatch(input))
+                {
+                    var arrayDate = input.Split('.');
+
+                    try
+                    {
+                        _ = new DateTime(Int32.Parse(arrayDate[2]), Int32.Parse(arrayDate[1]),
+                            Int32.Parse(arrayDate[0]));
+                        day = Int32.Parse(arrayDate[0]);
+                        month = Int32.Parse(arrayDate[1]);
+                        year = Int32.Parse(arrayDate[2]);
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    catch (Exception)
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You entered an invalid date ({input})");
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string prosessIdStr = input.Substring(position);
+
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
+                    {
+                        Console.Write("Are you sure you want to kill the process (y/n): ");
+                        string confirmation = Console.ReadLine();
+
+                        if (confirmation == "y")
+                        {
+                            Console.Clear();
+                            string message = ProcessWatchApplication.KillProcess(prosessId);
+                            _messenger.Append($"{message}\n");
+                            pageNo = 1;
+                            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                        }
+
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"Process with an Id of {prosessIdStr} is not running.");
+                    }
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Write("Are you sure you want to kill all visible processes (y/n): ");
+                    string confirmation = Console.ReadLine();
+
+                    if (confirmation == "y")
+                    {
+                        Console.Clear();
+                        StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                        _messenger.Append(messages);
+                        pageNo = 1;
+                        ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    }
+
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.Clear();
+                    _messenger.Append($"You have entered incorrect data ({input}).");
+                    continue;
+                }
+            }
+        }
+        
+        public void GetProcessesStartedAfterDate(int pageSize, int pageNo, int day, int month, int year)
+        {
+            string patternDate = @"^([0-3])([0-9]).([0-1])([0-9]).([2-3])([0-9])([0-9])([0-9])$";
+            Regex regxDate = new Regex(patternDate);
+
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+
+            while (true)
+            {
+                var processesAtDate =
+                    ProcessWatchApplication.SelectProcessesStartAfterDate(pageSize, pageNo, day: day, month: month, year: year);
+                PrintProcessesView(processesAtDate.ProcessesList);
+
+                Console.Write("PROCESSES STARTED AFTER GIVEN DATE: ");
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You have entered the wrong  page number ({number}).");
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxDate.IsMatch(input))
+                {
+                    var arrayDate = input.Split('.');
+
+                    try
+                    {
+                        _ = new DateTime(Int32.Parse(arrayDate[2]), Int32.Parse(arrayDate[1]),
+                            Int32.Parse(arrayDate[0]));
+                        day = Int32.Parse(arrayDate[0]);
+                        month = Int32.Parse(arrayDate[1]);
+                        year = Int32.Parse(arrayDate[2]);
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    catch (Exception)
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You entered an invalid date ({input})");
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string prosessIdStr = input.Substring(position);
+
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
+                    {
+                        Console.Write("Are you sure you want to kill the process (y/n): ");
+                        string confirmation = Console.ReadLine();
+
+                        if (confirmation == "y")
+                        {
+                            Console.Clear();
+                            string message = ProcessWatchApplication.KillProcess(prosessId);
+                            _messenger.Append($"{message}\n");
+                            pageNo = 1;
+                            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                        }
+
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"Process with an Id of {prosessIdStr} is not running.");
+                    }
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Write("Are you sure you want to kill all visible processes (y/n): ");
+                    string confirmation = Console.ReadLine();
+
+                    if (confirmation == "y")
+                    {
+                        Console.Clear();
+                        StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                        _messenger.Append(messages);
+                        pageNo = 1;
+                        ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    }
+
                     Console.Clear();
                 }
                 else

@@ -57,12 +57,10 @@ namespace Codecool.ProcessWatch.GUI
             have started in a given month includes all processes from each year.
 
         - processes started before date: filtering / searching for processes that 
-            started before the given date. The current hour and minutes are used 
-            for filtering.
+            started before the given date. The hour and minutes are equal zero.
 
         - processes started after date: filtering / searching for processes that 
-            started after the given date. The current hour and minutes are used 
-            for filtering.
+            started after the given date. The hour and minutes are equal zero.
 
         - processes physical memory usage greater than: filtering / searching for 
             processes that physical memory usage is greater than given value.
