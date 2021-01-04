@@ -8,15 +8,16 @@ namespace Codecool.ProcessWatch
 {
     public static class Program
     {
-        public static bool _isMainLoopRun = true;
+        public static bool IsMainLoopRun = true;
         private const int PageSize = 25;
         private static int _pageNo = 1;
+
         public static void Main()
         {
             ScreenView screenView = new ScreenView();
             Console.Clear();
-            
-            while (_isMainLoopRun)
+
+            while (IsMainLoopRun)
             {
                 Console.Write(screenView.MainMenu().ToString());
                 Console.Write("Enter the number or write \"exit\" to finish: ");
@@ -36,21 +37,35 @@ namespace Codecool.ProcessWatch
                                 break;
                             case 3:
                                 var todayDate = DateTime.Today;
-                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month, todayDate.Year);
+                                screenView.GetProcessesStartedAtDate(PageSize, _pageNo, todayDate.Day, todayDate.Month,
+                                    todayDate.Year);
                                 break;
                             case 4:
+                                var todayDay = DateTime.Today.Day;
+                                screenView.GetProcessesStartedAtDay(PageSize, _pageNo, todayDay);
                                 break;
                             case 5:
+                                var todayMonth = DateTime.Today.Month;
+                                screenView.GetProcessesStartedAtMonth(PageSize, _pageNo, todayMonth);
                                 break;
                             case 6:
+                                var todayBeforeDate = DateTime.Today;
+                                screenView.GetProcessesStartedBeforeDate(PageSize, _pageNo, todayBeforeDate.Day,
+                                    todayBeforeDate.Month, todayBeforeDate.Year);
                                 break;
                             case 7:
+                                var todayAfterDate = DateTime.Today;
+                                screenView.GetProcessesStartedAfterDate(PageSize, _pageNo, todayAfterDate.Day,
+                                    todayAfterDate.Month, todayAfterDate.Year);
                                 break;
                             case 8:
+                                screenView.GetProcessesMemoryUsageGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 9:
+                                screenView.GetProcessesUserCpuTimeGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 10:
+                                screenView.GetProcessesTotalCpuTimeGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 11:
                                 _ = new StartGui();
@@ -59,6 +74,7 @@ namespace Codecool.ProcessWatch
                                 ViewHelper.HelpInfo();
                                 break;
                             case 13:
+                                ViewHelper.AboutApp();
                                 break;
                         }
                     }
