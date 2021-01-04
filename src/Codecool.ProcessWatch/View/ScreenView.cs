@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.Model;
 
@@ -467,19 +463,19 @@ namespace Codecool.ProcessWatch.View
 
             while (true)
             {
-                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtDay(pageSize, pageNo, day);
-                PrintProcessesView(processesAtDate.ProcessesList);
+                var processesAtDay = ProcessWatchApplication.SelectProcessesStartAtDay(pageSize, pageNo, day);
+                PrintProcessesView(processesAtDay.ProcessesList);
 
                 Console.Write("PROCESSES FILTER BY DAY: ");
                 int startPage = 1;
-                if (processesAtDate.NumberOfPages == 0)
+                if (processesAtDay.NumberOfPages == 0)
                 {
-                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page 0 of {processesAtDay.NumberOfPages}");
                     startPage = 0;
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page {pageNo} of {processesAtDay.NumberOfPages}");
                     startPage = 1;
                 }
 
@@ -495,11 +491,11 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.Write(
-                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write day of month (--day=DD): ");
+                    $"Enter the page number ({startPage} - {processesAtDay.NumberOfPages}) to go next page or write day of month (--day=DD): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    if (number >= 1 && number <= processesAtDay.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -614,19 +610,19 @@ namespace Codecool.ProcessWatch.View
 
             while (true)
             {
-                var processesAtDate = ProcessWatchApplication.SelectProcessesStartAtMonth(pageSize, pageNo, month);
-                PrintProcessesView(processesAtDate.ProcessesList);
+                var processesAtMonth = ProcessWatchApplication.SelectProcessesStartAtMonth(pageSize, pageNo, month);
+                PrintProcessesView(processesAtMonth.ProcessesList);
 
                 Console.Write("PROCESSES FILTER BY MONTH: ");
                 int startPage = 1;
-                if (processesAtDate.NumberOfPages == 0)
+                if (processesAtMonth.NumberOfPages == 0)
                 {
-                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page 0 of {processesAtMonth.NumberOfPages}");
                     startPage = 0;
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page {pageNo} of {processesAtMonth.NumberOfPages}");
                     startPage = 1;
                 }
 
@@ -642,11 +638,11 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.Write(
-                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write a month (--month=MM): ");
+                    $"Enter the page number ({startPage} - {processesAtMonth.NumberOfPages}) to go next page or write a month (--month=MM): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    if (number >= 1 && number <= processesAtMonth.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -760,21 +756,21 @@ namespace Codecool.ProcessWatch.View
 
             while (true)
             {
-                var processesAtDate =
+                var processesBeforeDate =
                     ProcessWatchApplication.SelectProcessesStartBeforeDate(pageSize, pageNo, day: day, month: month,
                         year: year);
-                PrintProcessesView(processesAtDate.ProcessesList);
+                PrintProcessesView(processesBeforeDate.ProcessesList);
 
                 Console.Write("PROCESSES STARTED BEFORE GIVEN DATE: ");
                 int startPage = 1;
-                if (processesAtDate.NumberOfPages == 0)
+                if (processesBeforeDate.NumberOfPages == 0)
                 {
-                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page 0 of {processesBeforeDate.NumberOfPages}");
                     startPage = 0;
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page {pageNo} of {processesBeforeDate.NumberOfPages}");
                     startPage = 1;
                 }
 
@@ -790,11 +786,11 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.Write(
-                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+                    $"Enter the page number ({startPage} - {processesBeforeDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    if (number >= 1 && number <= processesBeforeDate.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -911,21 +907,21 @@ namespace Codecool.ProcessWatch.View
 
             while (true)
             {
-                var processesAtDate =
+                var processesAfterDate =
                     ProcessWatchApplication.SelectProcessesStartAfterDate(pageSize, pageNo, day: day, month: month,
                         year: year);
-                PrintProcessesView(processesAtDate.ProcessesList);
+                PrintProcessesView(processesAfterDate.ProcessesList);
 
                 Console.Write("PROCESSES STARTED AFTER GIVEN DATE: ");
                 int startPage = 1;
-                if (processesAtDate.NumberOfPages == 0)
+                if (processesAfterDate.NumberOfPages == 0)
                 {
-                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page 0 of {processesAfterDate.NumberOfPages}");
                     startPage = 0;
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page {pageNo} of {processesAfterDate.NumberOfPages}");
                     startPage = 1;
                 }
 
@@ -941,11 +937,11 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.Write(
-                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
+                    $"Enter the page number ({startPage} - {processesAfterDate.NumberOfPages}) to go next page or write date (eg. DD.MM.YYYY): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    if (number >= 1 && number <= processesAfterDate.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -1062,20 +1058,20 @@ namespace Codecool.ProcessWatch.View
 
             while (true)
             {
-                var processesAtDate =
+                var processesMemoryUsage =
                     ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(pageSize, pageNo, megaByte);
-                PrintProcessesView(processesAtDate.ProcessesList);
+                PrintProcessesView(processesMemoryUsage.ProcessesList);
 
                 Console.Write("PROCESSES FILTER BY MEMORY USAGE: ");
                 int startPage = 1;
-                if (processesAtDate.NumberOfPages == 0)
+                if (processesMemoryUsage.NumberOfPages == 0)
                 {
-                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page 0 of {processesMemoryUsage.NumberOfPages}");
                     startPage = 0;
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    Console.WriteLine($"Page {pageNo} of {processesMemoryUsage.NumberOfPages}");
                     startPage = 1;
                 }
 
@@ -1091,11 +1087,11 @@ namespace Codecool.ProcessWatch.View
                 }
 
                 Console.Write(
-                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write memory /MB/ (--memory=1.5): ");
+                    $"Enter the page number ({startPage} - {processesMemoryUsage.NumberOfPages}) to go next page or write memory /MB/ (--memory=1.5): ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
-                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    if (number >= 1 && number <= processesMemoryUsage.NumberOfPages)
                     {
                         pageNo = number;
                         Console.Clear();
@@ -1147,6 +1143,306 @@ namespace Codecool.ProcessWatch.View
                         _messenger.Append(
                             $"You entered an incorrect memory ({input.Substring(positionMemory)}).\n" +
                             "Allow range is from 0.0001 to 9999999999.9999 MB.");
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string prosessIdStr = input.Substring(position);
+
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
+                    {
+                        Console.Write("Are you sure you want to kill the process (y/n): ");
+                        string confirmation = Console.ReadLine();
+
+                        if (confirmation == "y")
+                        {
+                            Console.Clear();
+                            string message = ProcessWatchApplication.KillProcess(prosessId);
+                            _messenger.Append($"{message}\n");
+                            pageNo = 1;
+                            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                        }
+
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"Process with an Id of {prosessIdStr} is not running.");
+                    }
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Write("Are you sure you want to kill all visible processes (y/n): ");
+                    string confirmation = Console.ReadLine();
+
+                    if (confirmation == "y")
+                    {
+                        Console.Clear();
+                        StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                        _messenger.Append(messages);
+                        pageNo = 1;
+                        ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    }
+
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.Clear();
+                    _messenger.Append($"You have entered incorrect data ({input}).");
+                    continue;
+                }
+            }
+        }
+        
+        public void GetProcessesUserCpuTimeGreaterThan(int pageSize, int pageNo, double seconds)
+        {
+            string patternTime = @"^--time=([0-9]{1,10})(\.(?=[0-9])[0-9]{0,3})?$";
+            Regex regxTime = new Regex(patternTime);
+
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+
+            while (true)
+            {
+                var processesUserCpuTime =
+                    ProcessWatchApplication.SelectUserProcessorTimeGreaterThan(pageSize, pageNo, seconds);
+                PrintProcessesView(processesUserCpuTime.ProcessesList);
+
+                Console.Write("PROCESSES FILTER BY USER CPU TIME: ");
+                int startPage = 1;
+                if (processesUserCpuTime.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesUserCpuTime.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesUserCpuTime.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesUserCpuTime.NumberOfPages}) to go next page or write no of seconds (--time=1.5): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesUserCpuTime.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You have entered the wrong page number ({number}).");
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxTime.IsMatch(input))
+                {
+                    var positionUserCpuTime = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    double inputTime = Double.Parse(input.Substring(positionUserCpuTime).Trim(),
+                        CultureInfo.InvariantCulture);
+
+                    if (inputTime >= 0.001 && inputTime <= 9999999999.999)
+                    {
+                        seconds = inputTime;
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append(
+                            $"You entered an incorrect no of seconds ({input.Substring(positionUserCpuTime)}).\n" +
+                            "Allow range is from 0.001 to 9999999999.999 sec.");
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string prosessIdStr = input.Substring(position);
+
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
+                    {
+                        Console.Write("Are you sure you want to kill the process (y/n): ");
+                        string confirmation = Console.ReadLine();
+
+                        if (confirmation == "y")
+                        {
+                            Console.Clear();
+                            string message = ProcessWatchApplication.KillProcess(prosessId);
+                            _messenger.Append($"{message}\n");
+                            pageNo = 1;
+                            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                        }
+
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"Process with an Id of {prosessIdStr} is not running.");
+                    }
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Write("Are you sure you want to kill all visible processes (y/n): ");
+                    string confirmation = Console.ReadLine();
+
+                    if (confirmation == "y")
+                    {
+                        Console.Clear();
+                        StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                        _messenger.Append(messages);
+                        pageNo = 1;
+                        ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    }
+
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.Clear();
+                    _messenger.Append($"You have entered incorrect data ({input}).");
+                    continue;
+                }
+            }
+        }
+        
+        public void GetProcessesTotalCpuTimeGreaterThan(int pageSize, int pageNo, double seconds)
+        {
+            string patternTime = @"^--time=([0-9]{1,10})(\.(?=[0-9])[0-9]{0,3})?$";
+            Regex regxTime = new Regex(patternTime);
+
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+
+            while (true)
+            {
+                var processesTotalCpuTime =
+                    ProcessWatchApplication.SelectTotalProcessorTimeGreaterThan(pageSize, pageNo, seconds);
+                PrintProcessesView(processesTotalCpuTime.ProcessesList);
+
+                Console.Write("PROCESSES FILTER BY TOTAL CPU TIME: ");
+                int startPage = 1;
+                if (processesTotalCpuTime.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesTotalCpuTime.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesTotalCpuTime.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesTotalCpuTime.NumberOfPages}) to go next page or write no of seconds (--time=1.5): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesTotalCpuTime.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You have entered the wrong page number ({number}).");
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxTime.IsMatch(input))
+                {
+                    var positionUserCpuTime = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    double inputTime = Double.Parse(input.Substring(positionUserCpuTime).Trim(),
+                        CultureInfo.InvariantCulture);
+
+                    if (inputTime >= 0.001 && inputTime <= 9999999999.999)
+                    {
+                        seconds = inputTime;
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append(
+                            $"You entered an incorrect no of seconds ({input.Substring(positionUserCpuTime)}).\n" +
+                            "Allow range is from 0.001 to 9999999999.999 sec.");
                         continue;
                     }
                 }

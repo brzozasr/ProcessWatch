@@ -37,7 +37,13 @@ namespace Codecool.ProcessWatch.View
         --memory=[0.0001]       searches for processes that have processes 
                                 physical memory usage greater than given 
                                 memory in MB. Allow range is from 0.0001 
-                                to 9999999999.9999 MB.";
+                                to 9999999999.9999 MB.
+
+    Submenu ""Filter processes by user / total CPU time"":
+        --time=[0.001]          searches for processes that have processes 
+                                user / total  CPU time greater than given 
+                                time in seconds. Allow range is from 0.001 
+                                to 9999999999.999 sec.";
             
 
             Console.WriteLine(help);

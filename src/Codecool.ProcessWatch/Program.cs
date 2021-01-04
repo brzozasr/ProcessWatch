@@ -62,8 +62,10 @@ namespace Codecool.ProcessWatch
                                 screenView.GetProcessesMemoryUsageGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 9:
+                                screenView.GetProcessesUserCpuTimeGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 10:
+                                screenView.GetProcessesTotalCpuTimeGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 11:
                                 _ = new StartGui();
