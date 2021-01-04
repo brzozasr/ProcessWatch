@@ -68,11 +68,11 @@ namespace Codecool.ProcessWatch.Controller
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
         {
-            minute ??= DateTime.Now.Minute;
-            hour ??= DateTime.Now.Hour;
-            day ??= DateTime.Now.Day;
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
+            minute ??= DateTime.Today.Minute;
+            hour ??= DateTime.Today.Hour;
+            day ??= DateTime.Today.Day;
+            month ??= DateTime.Today.Month;
+            year ??= DateTime.Today.Year;
 
             // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
@@ -111,11 +111,11 @@ namespace Codecool.ProcessWatch.Controller
             int pageSize, int pageNo, int? minute = null, int? hour = null, int? day = null, int? month = null,
             int? year = null)
         {
-            minute ??= DateTime.Now.Minute;
-            hour ??= DateTime.Now.Hour;
-            day ??= DateTime.Now.Day;
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
+            minute ??= DateTime.Today.Minute;
+            hour ??= DateTime.Today.Hour;
+            day ??= DateTime.Today.Day;
+            month ??= DateTime.Today.Month;
+            year ??= DateTime.Today.Year;
 
             // var allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
 
@@ -242,7 +242,7 @@ namespace Codecool.ProcessWatch.Controller
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectPhysicalMemoryUsageGreaterThan(
             int pageSize, int pageNo, double physicalMemoryUsage)
         {
-            long convertToBytes = (long) physicalMemoryUsage * 1024 * 1024;
+            long convertToBytes = Convert.ToInt64(physicalMemoryUsage * 1024 * 1024);
 
             var searchedList = _allMemoryItemProcesses
                 .Where(x => x.PhysicalMemoryUsage != null
