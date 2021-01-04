@@ -242,7 +242,7 @@ namespace Codecool.ProcessWatch.Controller
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) SelectPhysicalMemoryUsageGreaterThan(
             int pageSize, int pageNo, double physicalMemoryUsage)
         {
-            long convertToBytes = (long) physicalMemoryUsage * 1024 * 1024;
+            long convertToBytes = Convert.ToInt64(physicalMemoryUsage * 1024 * 1024);
 
             var searchedList = _allMemoryItemProcesses
                 .Where(x => x.PhysicalMemoryUsage != null

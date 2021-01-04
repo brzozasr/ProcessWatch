@@ -59,6 +59,7 @@ namespace Codecool.ProcessWatch
                                     todayAfterDate.Month, todayAfterDate.Year);
                                 break;
                             case 8:
+                                screenView.GetProcessesMemoryUsageGreaterThan(PageSize, _pageNo, 1);
                                 break;
                             case 9:
                                 break;

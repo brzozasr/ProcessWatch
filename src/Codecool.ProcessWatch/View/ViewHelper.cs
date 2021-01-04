@@ -31,7 +31,14 @@ namespace Codecool.ProcessWatch.View
     Submenu ""Filter processes by month"":
         --month=[MM]            searches for processes that have started on 
                                 a given month takes into account all 
-                                processes from each month.";
+                                processes from each month.
+
+    Submenu ""Filter processes by memory usage"":
+        --memory=[0.0001]       searches for processes that have processes 
+                                physical memory usage greater than given 
+                                memory in MB. Allow range is from 0.0001 
+                                to 9999999999.9999 MB.";
+            
 
             Console.WriteLine(help);
             Console.WriteLine("Press any key to continue...");

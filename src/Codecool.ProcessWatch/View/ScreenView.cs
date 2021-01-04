@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -760,7 +761,8 @@ namespace Codecool.ProcessWatch.View
             while (true)
             {
                 var processesAtDate =
-                    ProcessWatchApplication.SelectProcessesStartBeforeDate(pageSize, pageNo, day: day, month: month, year: year);
+                    ProcessWatchApplication.SelectProcessesStartBeforeDate(pageSize, pageNo, day: day, month: month,
+                        year: year);
                 PrintProcessesView(processesAtDate.ProcessesList);
 
                 Console.Write("PROCESSES STARTED BEFORE GIVEN DATE: ");
@@ -898,7 +900,7 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesStartedAfterDate(int pageSize, int pageNo, int day, int month, int year)
         {
             string patternDate = @"^([0-3])([0-9]).([0-1])([0-9]).([2-3])([0-9])([0-9])([0-9])$";
@@ -910,7 +912,8 @@ namespace Codecool.ProcessWatch.View
             while (true)
             {
                 var processesAtDate =
-                    ProcessWatchApplication.SelectProcessesStartAfterDate(pageSize, pageNo, day: day, month: month, year: year);
+                    ProcessWatchApplication.SelectProcessesStartAfterDate(pageSize, pageNo, day: day, month: month,
+                        year: year);
                 PrintProcessesView(processesAtDate.ProcessesList);
 
                 Console.Write("PROCESSES STARTED AFTER GIVEN DATE: ");
@@ -994,6 +997,156 @@ namespace Codecool.ProcessWatch.View
                     {
                         Console.Clear();
                         _messenger.Append($"You entered an invalid date ({input})");
+                        continue;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(input) && regxKill.IsMatch(input))
+                {
+                    var position = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    string prosessIdStr = input.Substring(position);
+
+                    if (Int32.TryParse(prosessIdStr, out var prosessId))
+                    {
+                        Console.Write("Are you sure you want to kill the process (y/n): ");
+                        string confirmation = Console.ReadLine();
+
+                        if (confirmation == "y")
+                        {
+                            Console.Clear();
+                            string message = ProcessWatchApplication.KillProcess(prosessId);
+                            _messenger.Append($"{message}\n");
+                            pageNo = 1;
+                            ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                        }
+
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"Process with an Id of {prosessIdStr} is not running.");
+                    }
+                }
+                else if (input == "--kill-visible")
+                {
+                    Console.Write("Are you sure you want to kill all visible processes (y/n): ");
+                    string confirmation = Console.ReadLine();
+
+                    if (confirmation == "y")
+                    {
+                        Console.Clear();
+                        StringBuilder messages = ProcessWatchApplication.KillProcesses(ProcessWatchApplication.TmpList);
+                        _messenger.Append(messages);
+                        pageNo = 1;
+                        ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    }
+
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.Clear();
+                    _messenger.Append($"You have entered incorrect data ({input}).");
+                    continue;
+                }
+            }
+        }
+
+        public void GetProcessesMemoryUsageGreaterThan(int pageSize, int pageNo, double megaByte)
+        {
+            string patternMemory = @"^--memory=([0-9]{1,10})(\.(?=[0-9])[0-9]{0,4})?$";
+            Regex regxMemory = new Regex(patternMemory);
+
+            string patternKill = @"^--kill=[0-9]+$";
+            Regex regxKill = new Regex(patternKill);
+
+            while (true)
+            {
+                var processesAtDate =
+                    ProcessWatchApplication.SelectPhysicalMemoryUsageGreaterThan(pageSize, pageNo, megaByte);
+                PrintProcessesView(processesAtDate.ProcessesList);
+
+                Console.Write("PROCESSES FILTER BY MEMORY USAGE: ");
+                int startPage = 1;
+                if (processesAtDate.NumberOfPages == 0)
+                {
+                    Console.WriteLine($"Page 0 of {processesAtDate.NumberOfPages}");
+                    startPage = 0;
+                }
+                else
+                {
+                    Console.WriteLine($"Page {pageNo} of {processesAtDate.NumberOfPages}");
+                    startPage = 1;
+                }
+
+                Console.WriteLine("To go to the top menu write \"--gu\".");
+
+                if (!string.IsNullOrEmpty(_messenger.ToString()))
+                {
+                    char[] charsToTrim = {' ', '\n', '\t'};
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(_messenger.ToString().Trim(charsToTrim));
+                    _messenger.Clear();
+                    Console.ResetColor();
+                }
+
+                Console.Write(
+                    $"Enter the page number ({startPage} - {processesAtDate.NumberOfPages}) to go next page or write memory /MB/ (--memory=1.5): ");
+                string input = Console.ReadLine();
+                if (Int32.TryParse(input, out var number))
+                {
+                    if (number >= 1 && number <= processesAtDate.NumberOfPages)
+                    {
+                        pageNo = number;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append($"You have entered the wrong page number ({number}).");
+                        continue;
+                    }
+                }
+                else if (input == "--rf")
+                {
+                    ProcessWatchApplication.RefreshAllMemoryItemProcesses();
+                    Console.Clear();
+                    continue;
+                }
+                else if (input == "--gu")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else if (input == "--help")
+                {
+                    Console.Clear();
+                    ViewHelper.HelpInfo();
+                    continue;
+                }
+                else if (input == "--exit")
+                {
+                    Program.IsMainLoopRun = false;
+                    break;
+                }
+                else if (!string.IsNullOrEmpty(input) && regxMemory.IsMatch(input))
+                {
+                    var positionMemory = input.IndexOf("=", StringComparison.Ordinal) + 1;
+                    double inputMemory = Double.Parse(input.Substring(positionMemory).Trim(),
+                        CultureInfo.InvariantCulture);
+
+                    if (inputMemory >= 0.0001 && inputMemory <= 9999999999.9999)
+                    {
+                        megaByte = inputMemory;
+                        pageNo = 1;
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        _messenger.Append(
+                            $"You entered an incorrect memory ({input.Substring(positionMemory)}).\n" +
+                            "Allow range is from 0.0001 to 9999999999.9999 MB.");
                         continue;
                     }
                 }
