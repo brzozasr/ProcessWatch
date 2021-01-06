@@ -1197,7 +1197,7 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesUserCpuTimeGreaterThan(int pageSize, int pageNo, double seconds)
         {
             string patternTime = @"^--time=([0-9]{1,10})(\.(?=[0-9])[0-9]{0,3})?$";
@@ -1347,7 +1347,7 @@ namespace Codecool.ProcessWatch.View
                 }
             }
         }
-        
+
         public void GetProcessesTotalCpuTimeGreaterThan(int pageSize, int pageNo, double seconds)
         {
             string patternTime = @"^--time=([0-9]{1,10})(\.(?=[0-9])[0-9]{0,3})?$";
