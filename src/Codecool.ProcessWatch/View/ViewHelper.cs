@@ -44,8 +44,6 @@ namespace Codecool.ProcessWatch.View
                                 user / total  CPU time greater than given 
                                 time in seconds. Allow range is from 0.001 
                                 to 9999999999.999 sec.";
-            
-            
 
             Console.WriteLine(help);
             Console.WriteLine("Press any key to continue...");
@@ -69,7 +67,7 @@ namespace Codecool.ProcessWatch.View
         Apache License
         Version 2.0, January 2004
         http://www.apache.org/licenses/";
-            
+
             Console.WriteLine(about);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();

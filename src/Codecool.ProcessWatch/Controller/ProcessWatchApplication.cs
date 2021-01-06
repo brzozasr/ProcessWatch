@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Codecool.ProcessWatch.Model;
 
-
 namespace Codecool.ProcessWatch.Controller
 {
     public static class ProcessWatchApplication
@@ -14,12 +13,12 @@ namespace Codecool.ProcessWatch.Controller
         public static List<MemoryItemProcess> TmpList { get; private set; }
         public static int TmpNumberOfPages { get; private set; }
         private static List<MemoryItemProcess> _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
-        
+
         public static void RefreshAllMemoryItemProcesses()
         {
             _allMemoryItemProcesses = new DataHelper().GetAllMemoryItemProcesses();
         }
-        
+
         public static (int NumberOfPages, List<MemoryItemProcess> ProcessesList) AllProcesses(
             int pageSize, int pageNo)
         {
@@ -93,7 +92,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
-        
+
         /// <summary>
         /// Select Processes Start after given date.
         /// All arguments with date are optional
@@ -136,7 +135,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
-        
+
         /// <summary>
         /// Select Processes starts at given day
         /// </summary>
@@ -166,7 +165,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
-        
+
         /// <summary>
         /// Select Processes starts at given month.
         /// </summary>
@@ -196,7 +195,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
-        
+
         /// <summary>
         /// Select Processes starts at given date.
         /// </summary>
@@ -224,14 +223,14 @@ namespace Codecool.ProcessWatch.Controller
 
             var searchedDatesList = _allMemoryItemProcesses
                 .Where(x => x.StartTime != null
-                && x.StartTime.Value.Day == searchingDate.Day
-                && x.StartTime.Value.Month == searchingDate.Month
-                && x.StartTime.Value.Year == searchingDate.Year).ToList();
+                            && x.StartTime.Value.Day == searchingDate.Day
+                            && x.StartTime.Value.Month == searchingDate.Month
+                            && x.StartTime.Value.Year == searchingDate.Year).ToList();
 
 
             return ProcessesPagination(pageSize, pageNo, searchedDatesList);
         }
-        
+
         /// <summary>
         /// Select Physical Memory Usage greater than given memory in MB.
         /// </summary>
@@ -251,7 +250,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedList);
         }
-        
+
         /// <summary>
         /// Select User Processor Time greater than given time in seconds
         /// </summary>
@@ -271,7 +270,7 @@ namespace Codecool.ProcessWatch.Controller
 
             return ProcessesPagination(pageSize, pageNo, searchedList);
         }
-        
+
         /// <summary>
         /// Select Total Processor Time greater than given time in seconds.
         /// </summary>
@@ -308,11 +307,11 @@ namespace Codecool.ProcessWatch.Controller
                 return e.Message;
             }
         }
-        
+
         public static StringBuilder KillProcesses(List<MemoryItemProcess> tmpList)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             if (tmpList.Count > 0)
             {
                 tmpList.ForEach(x =>
@@ -344,7 +343,7 @@ namespace Codecool.ProcessWatch.Controller
 
                 var processesPage = listProcesses.OrderByDescending(x => x.StartTime)
                     .Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
-                
+
                 // var processesPage = listProcesses.OrderBy(x => x.ProcessId).
                 //     Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 
@@ -357,7 +356,7 @@ namespace Codecool.ProcessWatch.Controller
             var emptyList = new List<MemoryItemProcess>();
             TmpList = new List<MemoryItemProcess>(emptyList);
             TmpNumberOfPages = 0;
-            
+
             return (0, emptyList);
         }
 
