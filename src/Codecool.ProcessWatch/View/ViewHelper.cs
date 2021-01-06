@@ -45,6 +45,7 @@ namespace Codecool.ProcessWatch.View
                                 time in seconds. Allow range is from 0.001 
                                 to 9999999999.999 sec.";
             
+            
 
             Console.WriteLine(help);
             Console.WriteLine("Press any key to continue...");
