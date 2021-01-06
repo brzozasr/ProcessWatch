@@ -4,6 +4,7 @@ using Codecool.ProcessWatch.Controller;
 using Codecool.ProcessWatch.GUI;
 using Codecool.ProcessWatch.View;
 
+
 namespace Codecool.ProcessWatch
 {
     public static class Program
