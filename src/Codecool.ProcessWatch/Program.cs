@@ -21,7 +21,7 @@ namespace Codecool.ProcessWatch
             while (IsMainLoopRun)
             {
                 Console.Write(screenView.MainMenu().ToString());
-                Console.Write("Enter the number or write \"exit\" to finish: ");
+                Console.Write("Enter the number or write \"--exit\" to finish: ");
                 string input = Console.ReadLine();
                 if (Int32.TryParse(input, out var number))
                 {
