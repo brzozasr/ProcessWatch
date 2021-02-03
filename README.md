@@ -1,8 +1,8 @@
 # Process Watch
 
-## Print Screens
+## Screenshots
 
-![alt text](src/Codecool.ProcessWatch/PrintScreen/process_watch.png?raw=true?)
+![Screenshots](src/Codecool.ProcessWatch/PrintScreen/process_watch.png?raw=true)
 
 ## Story
 
